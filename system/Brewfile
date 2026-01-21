@@ -1,0 +1,60 @@
+cask_args appdir: "/Applications"
+
+# Build tools and compilers
+brew "gcc"
+brew "cmake"
+brew "llvm"
+brew "pkg-config"
+brew "openblas"
+brew "libomp"
+
+# Shell and CLI
+brew "zsh"
+brew "antidote"
+
+# Modern CLI tools
+brew "eza"
+brew "bat"
+brew "ripgrep"
+brew "fd"
+brew "zoxide"
+brew "fzf"
+brew "delta"
+brew "terminal-notifier"
+
+# Version control
+brew "git"
+
+# Languages
+brew "python3"
+brew "uv"
+brew "bun"
+
+# Documents
+brew "pandoc"
+
+# Libraries for R compilation
+brew "libtiff"
+brew "libpng"
+brew "jpeg-turbo"
+brew "freetype"
+brew "openssl"
+brew "zstd"
+
+# Casks
+cask "1password"
+cask "dropbox"
+cask "alfred"
+cask "ghostty"
+cask "little-snitch"
+cask "visual-studio-code"
+cask "visual-studio-code@insiders"
+cask "google-chrome"
+cask "spotify"
+cask "hazel"
+cask "zoom"
+cask "slack"
+cask "notion"
+cask "microsoft-office"
+cask "r"
+cask "mactex-no-gui"
