@@ -13,9 +13,5 @@ Host *
     IdentitiesOnly yes
     ServerAliveInterval 60
 
-# GitHub
-Host github.com
-    HostName github.com
-    IdentityFile ~/.ssh/id_github
-    User git
-
+# Additional hosts configurations in config.d
+Include /Users/adam/.config/ssh/config.d/*

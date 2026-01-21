@@ -17,7 +17,7 @@ if (( $+commands[op] )); then
     _src="$ZDOTDIR/secrets.zsh"
 
     # Refresh if missing or secrets.zsh was modified
-    if [[ ! -r "$_cache" || "$_src" -nt "$_cache" ]] && op inject -i "$_src" > "$_cache.tmp" 2>/dev/null; then
+    if [[ ! -r "$_cache" || "$_src" -nt "$_cache" ]] && op inject --in-file "$_src" --out-file "$_cache.tmp" 2>/dev/null; then
         chmod 600 "$_cache.tmp" && mv "$_cache.tmp" "$_cache"
     fi
 

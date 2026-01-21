@@ -20,6 +20,11 @@ echo "Installing Homebrew packages..."
 brew bundle --file="$SCRIPT_DIR/Brewfile"
 brew cleanup
 
+echo ""
+echo "Log in to installed services (1Password, etc.) before continuing."
+echo "Press Enter when ready..."
+read
+
 # Create XDG directories
 echo "Creating XDG directories..."
 mkdir -p "$HOME/.local/bin"
@@ -42,28 +47,23 @@ EOF
 
 # SSH configuration
 echo "Setting up SSH..."
+if [[ -d "$HOME/.ssh" ]]; then
+    mv "$HOME/.ssh" "$HOME/ssh-debug"
+    echo "Moved existing ~/.ssh to ~/ssh-debug"
+fi
 mkdir -p "$HOME/.ssh/sockets"
 chmod 700 "$HOME/.ssh"
-
-if [[ ! -f "$HOME/.ssh/config" ]]; then
-    # Fresh install - create config with Include
-    cat > "$HOME/.ssh/config" << 'EOF'
-# Include dotfiles SSH config
+cat > "$HOME/.ssh/config" << 'EOF'
 Include ~/.config/ssh/config
-Include ~/.config/ssh/config.d/*
 EOF
-elif ! grep -q "Include.*\.config/ssh/config" "$HOME/.ssh/config"; then
-    # Existing config - prepend Include if not already present
-    echo "Adding Include directive to existing ~/.ssh/config..."
-    temp=$(mktemp)
-    echo "# Include dotfiles SSH config" > "$temp"
-    echo "Include ~/.config/ssh/config" >> "$temp"
-    echo "Include ~/.config/ssh/config.d/*" >> "$temp"
-    echo "" >> "$temp"
-    cat "$HOME/.ssh/config" >> "$temp"
-    mv "$temp" "$HOME/.ssh/config"
-fi
 chmod 600 "$HOME/.ssh/config"
+
+# Inject SSH config from 1Password
+if command -v op &>/dev/null; then
+    echo "Injecting SSH config from 1Password..."
+    op read "op://Work/ir2amtuqlhxc6oyaxhgwiixum4/ssh config" --out-file "$CONFIG_DIR/ssh/config.d/SOFI.local"
+    chmod 600 "$CONFIG_DIR/ssh/config.d/SOFI.local"
+fi
 
 # R configuration (R doesn't support XDG, needs symlinks)
 echo "Setting up R..."

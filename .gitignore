@@ -45,3 +45,6 @@ git/config.local
 .DS_Store
 *.swp
 *~
+
+# Ignore local/sensitive files
+*.local
