@@ -7,7 +7,6 @@
 	editor = code --wait
 	pager = delta
 	whitespace = space-before-tab,-indent-with-non-tab,trailing-space
-	precomposeunicode = false
 	autocrlf = input
 
 [apply]
@@ -23,6 +22,7 @@
 
 [commit]
 	gpgsign = true
+	verbose = true
 
 [gpg]
 	format = ssh
@@ -31,22 +31,14 @@
 	helper = osxkeychain
 
 [diff]
-	tool = vscode
 	algorithm = histogram
-
-[difftool "vscode"]
-	cmd = code --wait --diff $LOCAL $REMOTE
 
 [diff "bin"]
 	textconv = hexdump -v -C
 
 [merge]
-	tool = vscode
 	log = true
 	conflictstyle = zdiff3
-
-[mergetool "vscode"]
-	cmd = code --wait $MERGED
 
 [help]
 	autocorrect = prompt
@@ -61,9 +53,25 @@
 
 [fetch]
 	prune = true
+	fsckObjects = true
+
+[receive]
+	fsckObjects = true
+
+[transfer]
+	fsckObjects = true
 
 [branch]
 	sort = -committerdate
+
+[tag]
+	sort = -version:refname
+
+[column]
+	ui = auto
+
+[status]
+	showUntrackedFiles = all
 
 [rebase]
 	autoStash = true
