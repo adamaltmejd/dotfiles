@@ -1,0 +1,7 @@
+# Completions and suggestions
+zsh-users/zsh-autosuggestions
+zsh-users/zsh-completions
+zdharma-continuum/fast-syntax-highlighting
+
+# Prompt theme
+romkatv/powerlevel10k

@@ -1,0 +1,26 @@
+# Whitelist approach: ignore everything, then explicitly track what we want
+*
+
+# Root files
+!.gitignore
+!README.md
+!CLAUDE.md
+!PLAN.md
+
+# Zsh configuration
+!zsh/
+!zsh/**
+
+# System files
+!system/
+!system/**
+
+# Ignore generated/local files within tracked dirs
+zsh/plugins.zsh
+zsh/.zcompdump*
+zsh/conf.d/local.zsh
+
+# Common junk
+.DS_Store
+*.swp
+*~

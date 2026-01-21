@@ -268,15 +268,19 @@ op inject -i ~/.config/some-template.tpl -o ~/.config/some-config.actual
 ## Migration Checklist
 
 - [x] Create new repo with README.md, CLAUDE.md, PLAN.md
-- [ ] Create directory structure (zsh/, git/, r/, ssh/, system/)
-- [ ] Migrate zsh configs (split by topic into conf.d/)
-- [ ] Migrate git config to `git/config`
-- [ ] Migrate SSH configs
-- [ ] Migrate R configs
-- [ ] Write setup.sh
-- [ ] Write .gitignore (whitelist approach)
+- [x] Create directory structure (zsh/, system/)
+- [x] Write .gitignore (whitelist approach)
+- [x] Write system/setup.sh (bootstrap ~/.zshenv)
+- [x] Migrate zsh essentials (core.zsh with options, completions, keybinds, core aliases)
 - [ ] Test on current machine with new ZDOTDIR
 - [ ] Push to GitHub
+- [ ] Migrate zsh topic configs (git.zsh, python.zsh, r.zsh, macos.zsh, node.zsh, ssh.zsh)
+- [ ] Migrate git config to `git/config`
+- [ ] Migrate SSH configs to `ssh/`
+- [ ] Migrate R configs to `r/`
+- [ ] Add symlinks to setup.sh (R, SSH, latexmk)
+- [ ] Add Homebrew bundle to setup.sh
+- [ ] Set up secrets with 1Password CLI
 - [ ] Test fresh install on VM or second machine
 - [ ] Remove Dropbox sync
 
