@@ -18,5 +18,3 @@ Host github.com
     IdentityFile ~/.ssh/id_github
     User git
 
-# Include host-specific configs
-Include ~/.config/ssh/config.d/*

@@ -18,7 +18,8 @@ mkdir -p "$HOME/.cache"
 # Write bootstrap ~/.zshenv
 echo "Writing bootstrap ~/.zshenv..."
 cat > "$HOME/.zshenv" << 'EOF'
-# Bootstrap XDG and ZDOTDIR - written by setup.sh
+#!/usr/bin/env zsh
+# Bootstrap XDG and ZDOTDIR - written by ~/.config/system/setup.sh
 export XDG_CONFIG_HOME="$HOME/.config"
 export XDG_DATA_HOME="$HOME/.local/share"
 export XDG_STATE_HOME="$HOME/.local/state"
@@ -37,6 +38,7 @@ if [[ ! -f "$HOME/.ssh/config" ]]; then
     cat > "$HOME/.ssh/config" << 'EOF'
 # Include dotfiles SSH config
 Include ~/.config/ssh/config
+Include ~/.config/ssh/config.d/*
 EOF
 elif ! grep -q "Include.*\.config/ssh/config" "$HOME/.ssh/config"; then
     # Existing config - prepend Include if not already present
@@ -44,6 +46,7 @@ elif ! grep -q "Include.*\.config/ssh/config" "$HOME/.ssh/config"; then
     temp=$(mktemp)
     echo "# Include dotfiles SSH config" > "$temp"
     echo "Include ~/.config/ssh/config" >> "$temp"
+    echo "Include ~/.config/ssh/config.d/*" >> "$temp"
     echo "" >> "$temp"
     cat "$HOME/.ssh/config" >> "$temp"
     mv "$temp" "$HOME/.ssh/config"
