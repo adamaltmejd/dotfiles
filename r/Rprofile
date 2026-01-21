@@ -12,17 +12,6 @@ options(renv.settings = list(
     use.cache = TRUE,
     vcs.ignore.library = TRUE
 ))
-# User config
-options(renv.config = list(
-    cache.enabled = TRUE,
-    cache.symlinks = TRUE,
-    pak.enabled = TRUE,
-    updates.check = FALSE,
-    #sandbox.enabled = FALSE, # faster startup (but less safe)
-    synchronized.check = FALSE, # speedup, stops languageserver error (https://github.com/REditorSupport/vscode-R/issues/1458)
-    user.environ = TRUE,
-    user.profile = TRUE
-))
 
 # Styler options
 options(languageserver.formatting_style = function(options) {
