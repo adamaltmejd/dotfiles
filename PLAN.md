@@ -279,7 +279,7 @@ op inject -i ~/.config/some-template.tpl -o ~/.config/some-config.actual
 - [x] Add Homebrew Brewfile to `system/`
 - [x] Test on current machine with new ZDOTDIR
 - [x] Push to GitHub
-- [ ] Set up secrets with 1Password CLI
+- [x] Set up secrets with 1Password CLI (lazy loading)
 - [ ] Test fresh install on VM or second machine
 - [ ] Remove Dropbox sync
 
