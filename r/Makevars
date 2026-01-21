@@ -1,0 +1,29 @@
+XC_LOC:=$(shell xcrun --show-sdk-path)
+LLVM_LOC:=$(shell brew --prefix llvm)
+GCC_LOC:=$(shell brew --prefix gcc)
+GETTEXT_LOC:=$(shell brew --prefix gettext)
+OMP_LOC:=$(shell brew --prefix libomp)
+
+CC=$(LLVM_LOC)/bin/clang
+CXX=$(LLVM_LOC)/bin/clang++
+CXX11=$(LLVM_LOC)/bin/clang++
+CXX14=$(LLVM_LOC)/bin/clang++
+CXX17=$(LLVM_LOC)/bin/clang++
+CXX1X=$(LLVM_LOC)/bin/clang++
+
+OBJC=$(LLVM_LOC)/bin/clang
+OBJCXX=$(LLVM_LOC)/bin/clang++
+
+CFLAGS=-g -O2 -Wall -pedantic -std=gnu99 -mtune=native -pipe
+CXXFLAGS=-g -O2 -Wall -pedantic -std=c++11 -mtune=native -pipe
+CXX11FLAGS=-g -O2 -Wall -pedantic -std=c++11 -mtune=native -pipe
+CXX14FLAGS=-g -O2 -Wall -pedantic -std=c++14 -mtune=native -pipe
+CXX17FLAGS=-g -O2 -Wall -pedantic -std=c++17 -mtune=native -pipe
+
+# X11, libtiff and jpeg-turbo needs to be included above for cairo/ragg/jpeg/httpgd
+LDFLAGS=-L"$(LLVM_LOC)/lib" -L"$(GETTEXT_LOC)/lib" -L/opt/homebrew/opt/libpng/lib -L/opt/homebrew/opt/libtiff/lib -L/opt/homebrew/opt/jpeg-turbo/lib -L/opt/homebrew/opt/zstd/lib -L/opt/homebrew/opt/mbedtls/lib -Wl,-rpath,$(LLVM_LOC)/lib --sysroot="$(XC_LOC)" -lomp
+CPPFLAGS=-I"$(GETTEXT_LOC)/include" -I"$(LLVM_LOC)/include" -I/opt/homebrew/opt/libpng/include -I/opt/homebrew/opt/libtiff/include -I/opt/homebrew/opt/jpeg-turbo/include -I/opt/homebrew/opt/zstd/include -I/opt/homebrew/opt/mbedtls/include -isysroot "$(XC_LOC)" -I"$(OMP_LOC)/include" -Xclang -fopenmp
+
+FC=$(GCC_LOC)/bin/gfortran
+F77=$(GCC_LOC)/bin/gfortran
+FLIBS=-L$(GCC_LOC)/lib/gcc/current/ -lm

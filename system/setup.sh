@@ -53,6 +53,15 @@ elif ! grep -q "Include.*\.config/ssh/config" "$HOME/.ssh/config"; then
 fi
 chmod 600 "$HOME/.ssh/config"
 
+# R configuration (R doesn't support XDG, needs symlinks)
+echo "Setting up R..."
+mkdir -p "$HOME/.R"
+ln -sf "$CONFIG_DIR/r/Rprofile" "$HOME/.Rprofile"
+ln -sf "$CONFIG_DIR/r/Renviron" "$HOME/.Renviron"
+ln -sf "$CONFIG_DIR/r/lintr" "$HOME/.lintr"
+ln -sf "$CONFIG_DIR/r/Makevars" "$HOME/.R/Makevars"
+# Note: radian uses XDG natively ($XDG_CONFIG_HOME/radian/profile)
+
 # Suppress login message
 touch "$HOME/.hushlogin"
 

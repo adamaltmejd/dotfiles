@@ -1,0 +1,10 @@
+linters: all_linters(
+    packages = "lintr",
+    line_length_linter(200L),
+    assignment_linter(operator = c("=")),
+    cyclocomp_linter = NULL,
+    undesirable_function_linter = NULL,
+    library_call_linter = NULL
+    )
+encoding: "UTF-8"
+exclusions: list("renv", "packrat", "_targets") # see ?lintr::exclude

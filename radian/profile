@@ -1,0 +1,28 @@
+# disable the [prompt_toolkit](https://python-prompt-toolkit.readthedocs.io/en/master/index.html) [`auto_suggest` feature](https://python-prompt-toolkit.readthedocs.io/en/master/pages/asking_for_input.html#auto-suggestion)
+# this option is experimental and is known to break python prompt, use it with caution
+options(radian.auto_suggest = TRUE)
+
+# Disable (pop-down) completion to not use screen space
+options(radian.complete_while_typing = FALSE)
+
+# highlight matching bracket
+options(radian.highlight_matching_bracket = TRUE)
+
+# insert new line between prompts
+options(radian.insert_new_line = FALSE)
+
+# when using history search (ctrl-r/ctrl-s in emacs mode), do not show duplicate results
+options(radian.history_search_no_duplicates = TRUE)
+# ignore case in history search
+options(radian.history_search_ignore_case = TRUE)
+
+# custom prompt for different modes
+options(radian.prompt = "\033[0;34m>\033[0m ")
+options(radian.shell_prompt = "\033[0;31m#\033[0m ")
+#options(radian.browse_prompt = "\033[0;33mBrowse[{}]>\033[0m ")
+
+# stderr color format
+options(radian.stderr_format = "\033[0;31m{}\033[0m")
+
+# enable reticulate prompt and trigger `~`
+options(radian.enable_reticulate_prompt = FALSE)

@@ -19,6 +19,14 @@
 !ssh/
 !ssh/**
 
+# R configuration
+!r/
+!r/**
+
+# Radian (R console)
+!radian/
+!radian/**
+
 # System files
 !system/
 !system/**

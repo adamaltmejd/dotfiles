@@ -1,0 +1,73 @@
+# See help(startup) for documentation
+options(repos = c(CRAN = "https://packagemanager.posit.co/cran/latest"))
+
+options(stringsAsFactors = FALSE)
+options(menu.graphics = FALSE) # Don't load TK
+Sys.setenv(TZ = "Europe/Stockholm")
+
+# Renv
+# Project settings
+options(renv.settings = list(
+    snapshot.type = "implicit",
+    use.cache = TRUE,
+    vcs.ignore.library = TRUE
+))
+# User config
+options(renv.config = list(
+    cache.enabled = TRUE,
+    cache.symlinks = TRUE,
+    pak.enabled = TRUE,
+    updates.check = FALSE,
+    #sandbox.enabled = FALSE, # faster startup (but less safe)
+    synchronized.check = FALSE, # speedup, stops languageserver error (https://github.com/REditorSupport/vscode-R/issues/1458)
+    user.environ = TRUE,
+    user.profile = TRUE
+))
+
+# Styler options
+options(languageserver.formatting_style = function(options) {
+    style <- styler::tidyverse_style(indent_by = options$tabSize)
+    style$token$force_assignment_op <- NULL # disables assignment forced to "<-"
+    style
+})
+
+if (interactive() || isatty(stdout())) {
+    options(setWidthOnResize = TRUE)
+    options(max.print = 200)
+    options(width = 200)
+    options(prompt = "> ")
+    options(continue = "... ") # Wider continuation prompt
+
+    # Data.table options
+    options(datatable.print.trunc.cols = TRUE)
+    options(datatable.prettyprint.char = 30L)
+
+    # VSCode attach
+    if (Sys.getenv("TERM_PROGRAM") == "vscode") {
+        # For SessionWatcher to work in renv folders we need to install rlang and jsonlite manually!
+        source(file.path(Sys.getenv(if (.Platform$OS.type == "windows") "USERPROFILE" else "HOME"), ".vscode-R", "init.R"))
+    }
+
+    if (!nzchar(Sys.getenv("RADIAN_VERSION"))) {
+        # Only run when radian is not used:
+
+        # "q()": quit immediately and not save workspace.
+        q <- function(save = "no", ...) { quit(save = save, ...) }
+
+        # Enables the colorized output from R (provided by the colorout package) on appropriate consoles.
+        # Needs to be downloaded manually from here:
+        # https://github.com/jalvesaq/colorout
+        if (Sys.getenv("TERM") %in% c("xterm-256color", "screen", "screen-256color")) {
+            suppressMessages(require("colorout", lib.loc = "~/.R/packages"))
+        }
+
+        # Automatically saves Rhistory even on --no-save.
+        invisible(reg.finalizer(
+            .GlobalEnv,
+            eval(bquote(function(e) try(savehistory(file.path(.(getwd()), ".Rhistory"))))),
+            onexit = TRUE
+        ))
+    }
+}
+
+# END (needs newline)
