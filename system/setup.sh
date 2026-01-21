@@ -65,6 +65,9 @@ if command -v op &>/dev/null; then
     chmod 600 "$CONFIG_DIR/ssh/config.d/SOFI.local"
 fi
 
+# Build sk-libfido2.dylib for macOS built-in SSH FIDO2 support
+[[ -f /usr/local/lib/sk-libfido2.dylib ]] || "$CONFIG_DIR/ssh/build-sk-libfido2.sh"
+
 # R configuration (R doesn't support XDG, needs symlinks)
 echo "Setting up R..."
 mkdir -p "$HOME/.R"

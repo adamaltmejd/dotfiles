@@ -7,6 +7,8 @@ brew "llvm"
 brew "pkg-config"
 brew "openblas"
 brew "libomp"
+# SSH FIDO2 support (runtime dependency for sk-libfido2.dylib)
+brew "libfido2"
 
 # Shell and CLI
 brew "zsh"
