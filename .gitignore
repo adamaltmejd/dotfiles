@@ -27,6 +27,10 @@
 !radian/
 !radian/**
 
+# Ansible
+!ansible/
+!ansible/**
+
 # System files
 !system/
 !system/**

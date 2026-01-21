@@ -6,6 +6,22 @@
 unsetopt GLOBAL_RCS # disabled /etc/zprofile loading
 
 #
+# PATH
+#
+# Apple defaults
+if [[ -x /opt/homebrew/bin/brew ]]; then
+  eval $(/usr/libexec/path_helper -s)
+fi
+# Homebrew
+if [[ -x /opt/homebrew/bin/brew ]]; then
+  eval $(/opt/homebrew/bin/brew shellenv)
+fi
+
+# Additional paths
+PATH="$HOME/.bun/bin:$PATH"
+PATH="$HOME/.local/bin:$PATH"
+
+#
 # Editors
 #
 if [[ -n $SSH_CONNECTION ]]; then
@@ -46,18 +62,4 @@ export LESS_TERMCAP_us=$'\E[01;32m'
 export SSH_SK_PROVIDER=/usr/local/lib/sk-libfido2.dylib
 export SSH_ASKPASS="$XDG_CONFIG_HOME/ssh/ssh-askpass"
 
-#
-# PATH
-#
-# Apple defaults
-if [[ -x /opt/homebrew/bin/brew ]]; then
-  eval $(/usr/libexec/path_helper -s)
-fi
-# Homebrew
-if [[ -x /opt/homebrew/bin/brew ]]; then
-  eval $(/opt/homebrew/bin/brew shellenv)
-fi
-
-# Additional paths
-PATH="$HOME/.bun/bin:$PATH"
-PATH="$HOME/.local/bin:$PATH"
+export ANSIBLE_VAULT_PASSWORD_FILE="$XDG_CONFIG_HOME/ansible/vault-password-file"
