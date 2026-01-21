@@ -27,6 +27,29 @@ export ZDOTDIR="$XDG_CONFIG_HOME/zsh"
 [[ -f "$ZDOTDIR/.zshenv" ]] && source "$ZDOTDIR/.zshenv"
 EOF
 
+# SSH configuration
+echo "Setting up SSH..."
+mkdir -p "$HOME/.ssh/sockets"
+chmod 700 "$HOME/.ssh"
+
+if [[ ! -f "$HOME/.ssh/config" ]]; then
+    # Fresh install - create config with Include
+    cat > "$HOME/.ssh/config" << 'EOF'
+# Include dotfiles SSH config
+Include ~/.config/ssh/config
+EOF
+elif ! grep -q "Include.*\.config/ssh/config" "$HOME/.ssh/config"; then
+    # Existing config - prepend Include if not already present
+    echo "Adding Include directive to existing ~/.ssh/config..."
+    temp=$(mktemp)
+    echo "# Include dotfiles SSH config" > "$temp"
+    echo "Include ~/.config/ssh/config" >> "$temp"
+    echo "" >> "$temp"
+    cat "$HOME/.ssh/config" >> "$temp"
+    mv "$temp" "$HOME/.ssh/config"
+fi
+chmod 600 "$HOME/.ssh/config"
+
 # Suppress login message
 touch "$HOME/.hushlogin"
 

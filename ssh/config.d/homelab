@@ -1,0 +1,52 @@
+# Breven Homelab services (VLAN40, 50)
+Host 10.?.40.* 10.?.50.* !10.?.50.2
+    Port 22
+    IdentityFile ~/.ssh/id_home
+    PasswordAuthentication no
+    StrictHostKeyChecking no
+    UserKnownHostsFile /dev/null
+    LogLevel ERROR
+
+# Breven Homelab VMs login as adam (10.1.40.2-9)
+Host 10.?.40.?
+    User adam
+
+# Breven Homelab LXCs only have the root user (.10+)
+Host 10.?.40.?? 10.?.50.*
+    User root
+
+Host sthlm-old.*
+    User adam
+    Port 22
+    IdentityFile ~/.ssh/id_sthlm
+    ForwardAgent yes
+    RemoteForward /run/user/1000/gnupg/S.gpg-agent /Users/adam/.gnupg/S.gpg-agent.extra
+
+Host sthlm-old.internal
+    HostName 10.0.1.121
+
+Host sthlm-old.ts
+    HostName 100.84.218.13
+
+Host ha-breven.*
+    User adam
+    Port 8472
+    IdentityFile ~/.ssh/id_breven
+    ForwardAgent yes
+    RemoteForward /run/user/1000/gnupg/S.gpg-agent /Users/adam/.gnupg/S.gpg-agent.extra
+
+Host ha-breven.internal
+    HostName 10.1.0.101
+
+Host ha-breven.ts
+    HostName ha-breven.boga-hadar.ts.net
+
+Host rutx50.*
+    User root
+    IdentityFile ~/.ssh/id_home
+
+Host rutx50.internal
+    HostName 192.168.1.1
+
+Host rutx50.ts
+    HostName rutx50.boga-hadar.ts.net

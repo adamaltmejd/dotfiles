@@ -1,0 +1,22 @@
+# Global SSH configuration
+# Included by ~/.ssh/config
+
+# Connection multiplexing
+ControlMaster auto
+ControlPath ~/.ssh/sockets/%r@%h:%p
+ControlPersist 1800
+
+# Default settings for all hosts
+Host *
+    AddKeysToAgent yes
+    UseKeychain yes
+    IdentitiesOnly yes
+
+# GitHub
+Host github.com
+    HostName github.com
+    IdentityFile ~/.ssh/id_github
+    User git
+
+# Include host-specific configs
+Include ~/.config/ssh/config.d/*

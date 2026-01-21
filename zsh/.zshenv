@@ -46,6 +46,12 @@ export LESS_TERMCAP_us=$'\E[01;32m'
 export GPG_TTY="$(tty)"
 
 #
+# SSH (YubiKey FIDO support)
+#
+export SSH_SK_PROVIDER=/usr/local/lib/sk-libfido2.dylib
+export SSH_ASKPASS="$XDG_CONFIG_HOME/ssh/ssh-askpass"
+
+#
 # PATH
 #
 PATH="/usr/bin:/bin:/usr/sbin:/sbin"

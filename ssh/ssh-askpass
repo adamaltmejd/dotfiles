@@ -1,0 +1,25 @@
+#!/bin/bash
+#
+# SSH_ASKPASS script for YubiKey with pinentry-mac
+# Shows touch notification for FIDO keys, prompts PIN via pinentry-mac
+
+# Handle YubiKey touch confirmation
+if [[ "$1" == "Confirm user presence"* ]]; then
+    terminal-notifier -title "SSH Authentication" -message "Touch your YubiKey" -sound default &
+    echo
+    exit 0
+fi
+
+# Build pinentry prompt
+if [[ "$1" == *"SHA256:"* ]]; then
+    sha256="${1#*SHA256:}"
+    sha256="${sha256%% *}"
+    prompt="SETDESC $1\nOPTION allow-external-password-cache\nSETKEYINFO $sha256\nGETPIN\n"
+else
+    prompt="SETDESC $1\nGETPIN\n"
+fi
+
+# Get PIN from pinentry-mac
+response=$(printf '%b' "$prompt" | pinentry-mac 2>/dev/null)
+pin=$(echo "$response" | grep '^D ' | cut -c3-)
+echo "$pin"
