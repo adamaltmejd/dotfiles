@@ -27,19 +27,32 @@ exec zsh
 │   ├── .zshenv
 │   ├── .p10k.zsh
 │   ├── plugins.txt             # Antidote plugins
+│   ├── secrets.zsh             # 1Password secrets loader
 │   └── conf.d/                 # Topic-based configs
 │       ├── core.zsh
 │       ├── git.zsh
+│       ├── macos.zsh
+│       ├── node.zsh
 │       ├── python.zsh
-│       ├── r.zsh
-│       └── ...
+│       └── r.zsh
 ├── git/                        # Git config (XDG native)
 │   ├── config
 │   └── ignore
 ├── r/                          # R configs (symlinked to ~/)
+│   ├── Rprofile
+│   ├── Renviron
+│   ├── Makevars
+│   └── lintr
+├── radian/                     # Radian R console config
+│   └── profile
 ├── ssh/                        # SSH config (included by ~/.ssh/config)
-├── system/                     # Setup scripts, Brewfile, macOS defaults
-└── ...
+│   ├── config
+│   └── config.d/
+├── ansible/                    # Ansible config
+│   └── vault-password-file
+└── system/                     # Setup scripts, Brewfile
+    ├── setup.sh
+    └── Brewfile
 ```
 
 ## XDG Base Directory
@@ -61,20 +74,20 @@ Some tools don't support XDG. These are handled by `setup.sh`:
 |------|---------|-----|
 | `~/.zshenv` | Bootstrap ZDOTDIR | Written by setup.sh |
 | `~/.ssh/config` | SSH configuration | Includes `~/.config/ssh/config` |
-| `~/.Rprofile` | R startup | Symlink |
-| `~/.Renviron` | R environment | Symlink |
-| `~/.latexmkrc` | LaTeX config | Symlink |
+| `~/.Rprofile` | R startup | Symlink to `r/Rprofile` |
+| `~/.Renviron` | R environment | Symlink to `r/Renviron` |
 
 ## Modern CLI Tools
 
 | Tool | Replaces | Usage |
 |------|----------|-------|
 | `eza` | `ls` | Aliased to `ls`, `l`, `la`, `tree` |
-| `bat` | `cat` | Aliased to `cat` |
+| `bat` | `cat` | Aliased to `cat`, also used as man pager |
 | `ripgrep` | `grep` | `rg` |
 | `fd` | `find` | `fd` |
 | `zoxide` | `cd` | `z <partial>` |
 | `fzf` | - | Ctrl+R history, Ctrl+T files |
+| `tlrc` | `man`/`tldr` | Modern tldr client |
 | `delta` | git diff | Automatic via gitconfig |
 
 ## Package Managers
@@ -87,7 +100,7 @@ Some tools don't support XDG. These are handled by `setup.sh`:
 
 ## Secrets
 
-Secrets are managed via 1Password CLI (`op`). No secrets are stored in this repository.
+Secrets are managed via 1Password CLI (`op`). No secrets are stored in this repository. Secrets are loaded via `zsh/secrets.zsh`.
 
 ## License
 
