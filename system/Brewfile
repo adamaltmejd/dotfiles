@@ -19,6 +19,7 @@ brew "ripgrep"
 brew "fd"
 brew "zoxide"
 brew "fzf"
+brew "tlrc"
 brew "delta"
 brew "terminal-notifier"
 

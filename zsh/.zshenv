@@ -48,13 +48,6 @@ export TZ="Europe/Stockholm"
 # Less
 #
 export LESS="--raw-control-chars --ignore-case --squeeze-blank-lines --hilite-unread"
-export LESS_TERMCAP_mb=$'\E[01;31m'
-export LESS_TERMCAP_md=$'\E[01;31m'
-export LESS_TERMCAP_me=$'\E[0m'
-export LESS_TERMCAP_se=$'\E[0m'
-export LESS_TERMCAP_so=$'\E[01;44;33m'
-export LESS_TERMCAP_ue=$'\E[0m'
-export LESS_TERMCAP_us=$'\E[01;32m'
 
 #
 # SSH (YubiKey FIDO support)
@@ -62,4 +55,7 @@ export LESS_TERMCAP_us=$'\E[01;32m'
 export SSH_SK_PROVIDER=/usr/local/lib/sk-libfido2.dylib
 export SSH_ASKPASS="$XDG_CONFIG_HOME/ssh/ssh-askpass"
 
+#
+# Additional configs
+#
 export ANSIBLE_VAULT_PASSWORD_FILE="$XDG_CONFIG_HOME/ansible/vault-password-file"

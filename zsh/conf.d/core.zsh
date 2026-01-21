@@ -115,6 +115,10 @@ alias tree="eza --tree"
 # Modern cat (bat)
 alias cat="bat --paging=never"
 
+# Use bat as man pager
+export MANPAGER="sh -c 'col -bx | bat -l man -p'"
+export MANROFFOPT="-c"
+
 # Grep with color
 alias grep='grep --color=auto'
 
@@ -159,6 +163,11 @@ fs() {
 # Echo to stderr
 echoerr() {
     printf "%s\n" "$*" >&2
+}
+
+# Fuzzy-find man pages
+fman() {
+    man -k . | fzf --preview 'man {1}' | awk '{print $1}' | xargs -r man
 }
 
 # Erase current session history
