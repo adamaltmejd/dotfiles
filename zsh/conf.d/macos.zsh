@@ -37,9 +37,8 @@ dropbox_ignore() {
 
 dropbox_ignore_all() {
     # Ignore .venv, node_modules, .git in Dropbox
-    find "$HOME/Library/CloudStorage/Dropbox" -type d -name ".venv" -prune -print -exec xattr -w 'com.apple.fileprovider.ignore#P' 1 {} \;
-    find "$HOME/Library/CloudStorage/Dropbox" -type d -name "node_modules" -prune -print -exec xattr -w 'com.apple.fileprovider.ignore#P' 1 {} \;
-    find "$HOME/Library/CloudStorage/Dropbox" -type d -name ".git" -prune -print -exec xattr -w 'com.apple.fileprovider.ignore#P' 1 {} \;
+    find "$HOME/Library/CloudStorage/Dropbox" -type d \( -name ".venv" -o -name "node_modules" -o -name ".git" \) \
+        -exec xattr -w 'com.apple.fileprovider.ignore#P' 1 {} \; -print -prune
 }
 
 #

@@ -18,6 +18,7 @@ fi
 # Install packages from Brewfile
 echo "Installing Homebrew packages..."
 brew bundle --file="$SCRIPT_DIR/Brewfile"
+brew cleanup
 
 # Create XDG directories
 echo "Creating XDG directories..."

@@ -11,6 +11,7 @@ Host *
     AddKeysToAgent yes
     UseKeychain yes
     IdentitiesOnly yes
+    ServerAliveInterval 60
 
 # GitHub
 Host github.com

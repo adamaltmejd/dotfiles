@@ -39,45 +39,76 @@ export HISTFILE="${XDG_STATE_HOME:-$HOME/.local/state}/zsh/history"
 #
 # Completion Styles
 #
-zstyle ':completion:*:approximate:' max-errors 'reply=( $((($#PREFIX+$#SUFFIX)/3 )) numeric )'
-zstyle ':completion:*:complete:-command-::commands' ignored-patterns '(aptitude-*|*\~)'
+
+# -- Completion behavior --
+# Completers to use: previous list, expand aliases/globs, standard, pattern match, ignored, fuzzy
 zstyle ':completion:*' completer _oldlist _expand _complete _match _ignored _approximate
-zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
-zstyle ':completion:*' insert-tab pending
-zstyle ':completion:*' rehash true
+zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'         # Case-insensitive matching
+zstyle ':completion:*' insert-tab pending                   # Tab inserts tab when line empty
+zstyle ':completion:*' rehash true                          # Auto-detect new executables in PATH
+zstyle ':completion:*' accept-exact '*(N)'                  # Accept exact match without menu
+zstyle ':completion:*' squeeze-slashes true                 # Treat // as / in paths
+zstyle ':completion:*' complete-options true                # Complete options after = in --opt=val
 
-zstyle ':completion:*:correct:*' insert-unambiguous true
-zstyle ':completion:*:corrections' format $'%{\e[0;31m%}%d (errors: %e)%{\e[0m%}'
-zstyle ':completion:*:correct:*' original true
-zstyle ':completion:*:default' list-colors ${(s.:.)LS_COLORS}
-zstyle ':completion:*:descriptions' format $'%{\e[0;31m%}completing %B%d%b%{\e[0m%}'
+# -- Caching (for slow completions like apt, brew) --
+zstyle ':completion:*' use-cache on
+zstyle ':completion:*' cache-path "${XDG_CACHE_HOME:-$HOME/.cache}/zsh/compcache"
 
-zstyle ':completion:*:*:cd:*:directory-stack' menu yes select
-zstyle ':completion:*:expand:*' tag-order all-expansions
-zstyle ':completion:*:history-words' list false
-zstyle ':completion:*:history-words' menu yes
-zstyle ':completion:*:history-words' remove-all-dups yes
-zstyle ':completion:*:history-words' stop yes
-
-zstyle ':completion:*:matches' group 'yes'
-zstyle ':completion:*' group-name ''
-zstyle ':completion:*' menu select=5
-zstyle ':completion:*:messages' format '%d'
-zstyle ':completion:*:options' auto-description '%d'
-zstyle ':completion:*:options' description 'yes'
-zstyle ':completion:*:processes' command 'ps -au$USER'
-zstyle ':completion:*:*:-subscript-:*' tag-order indexes parameters
-zstyle ':completion:*' verbose true
-zstyle ':completion:*:-command-:*:' verbose false
-zstyle ':completion:*:warnings' format $'%{\e[0;31m%}No matches for:%{\e[0m%} %d'
-zstyle ':completion:*:*:zcompile:*' ignored-patterns '(*~|*.zwc)'
+# -- Fuzzy matching / correction --
+zstyle ':completion:*:approximate:' max-errors 'reply=( $((($#PREFIX+$#SUFFIX)/3 )) numeric )'  # 1 error per 3 chars
+zstyle ':completion:*:correct:*' insert-unambiguous true    # Insert common prefix
+zstyle ':completion:*:correct:*' original true              # Offer original as option
 zstyle ':completion:correct:' prompt 'correct to: %e'
-zstyle ':completion::(^approximate*):*:functions' ignored-patterns '_*'
+
+# -- Display formatting --
+zstyle ':completion:*:default' list-colors ${(s.:.)LS_COLORS}                              # Use LS_COLORS
+zstyle ':completion:*:descriptions' format $'%{\e[0;31m%}completing %B%d%b%{\e[0m%}'       # Section headers
+zstyle ':completion:*:corrections' format $'%{\e[0;31m%}%d (errors: %e)%{\e[0m%}'          # Fuzzy match info
+zstyle ':completion:*:warnings' format $'%{\e[0;31m%}No matches for:%{\e[0m%} %d'          # No matches warning
+zstyle ':completion:*:messages' format '%d'
+zstyle ':completion:*' verbose true                         # Show descriptions
+zstyle ':completion:*:-command-:*:' verbose false           # ...except for commands (too noisy)
+
+# -- Grouping and menus --
+zstyle ':completion:*:matches' group 'yes'                  # Group matches by type
+zstyle ':completion:*' group-name ''                        # Use tag name as group name
+zstyle ':completion:*' menu select=5                        # Show menu if 5+ matches
+zstyle ':completion:*' select-prompt '%SScrolling: %p%s'    # Show position in long lists
+
+# -- Options and descriptions --
+zstyle ':completion:*:options' auto-description '%d'        # Describe options without descriptions
+zstyle ':completion:*:options' description 'yes'
+
+# -- Directory completion --
+zstyle ':completion:*:*:cd:*:directory-stack' menu yes select   # Menu for cd dir stack
+zstyle ':completion:*' special-dirs ..                          # Complete .. as parent dir
+zstyle ':completion:*:expand:*' tag-order all-expansions        # Show all glob expansions
+
+# -- History word completion --
+zstyle ':completion:*:history-words' list false             # Don't list, just complete
+zstyle ':completion:*:history-words' menu yes               # Use menu selection
+zstyle ':completion:*:history-words' remove-all-dups yes    # No duplicates
+zstyle ':completion:*:history-words' stop yes               # Stop at word boundaries
+
+# -- Process completion (kill, etc.) --
+zstyle ':completion:*:processes' command 'ps -au$USER'
 zstyle ':completion:*:processes-names' command 'ps c -u ${USER} -o command | uniq'
-zstyle ':completion:*:manuals' separate-sections true
-zstyle ':completion:*:manuals.*' insert-sections true
+zstyle ':completion:*:*:kill:*:processes' list-colors '=(#b) #([0-9]#)*=0=01;31'  # Highlight PIDs
+zstyle ':completion:*:*:kill:*' insert-ids single           # Only insert PID if unambiguous
+zstyle ':completion:*:*:kill:*' menu yes select             # Menu for kill
+
+# -- Man page completion --
+zstyle ':completion:*:manuals' separate-sections true       # Group by section
+zstyle ':completion:*:manuals.*' insert-sections true       # Include section number
 zstyle ':completion:*:man:*' menu yes select
-zstyle ':completion:*' special-dirs ..
+
+# -- Array subscript completion --
+zstyle ':completion:*:*:-subscript-:*' tag-order indexes parameters
+
+# -- Ignore patterns --
+zstyle ':completion:*:complete:-command-::commands' ignored-patterns '(aptitude-*|*\~)'  # Hide aptitude-* and backup files
+zstyle ':completion:*:*:zcompile:*' ignored-patterns '(*~|*.zwc)'                        # Hide compiled zsh files
+zstyle ':completion::(^approximate*):*:functions' ignored-patterns '_*'                  # Hide internal _functions
 
 #
 # Key Bindings
