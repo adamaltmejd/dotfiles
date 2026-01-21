@@ -11,6 +11,10 @@
 !zsh/
 !zsh/**
 
+# Git configuration
+!git/
+!git/**
+
 # System files
 !system/
 !system/**
@@ -19,6 +23,7 @@
 zsh/plugins.zsh
 zsh/.zcompdump*
 zsh/conf.d/local.zsh
+git/config.local
 
 # Common junk
 .DS_Store
