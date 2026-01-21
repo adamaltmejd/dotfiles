@@ -268,18 +268,17 @@ op inject -i ~/.config/some-template.tpl -o ~/.config/some-config.actual
 ## Migration Checklist
 
 - [x] Create new repo with README.md, CLAUDE.md, PLAN.md
-- [x] Create directory structure (zsh/, system/)
+- [x] Create directory structure (zsh/, git/, ssh/, r/, radian/, system/)
 - [x] Write .gitignore (whitelist approach)
-- [x] Write system/setup.sh (bootstrap ~/.zshenv)
+- [x] Write system/setup.sh (bootstrap, SSH, R symlinks, Homebrew)
 - [x] Migrate zsh essentials (core.zsh with options, completions, keybinds, core aliases)
-- [ ] Test on current machine with new ZDOTDIR
-- [ ] Push to GitHub
-- [ ] Migrate zsh topic configs (git.zsh, python.zsh, r.zsh, macos.zsh, node.zsh, ssh.zsh)
-- [ ] Migrate git config to `git/config`
-- [ ] Migrate SSH configs to `ssh/`
-- [ ] Migrate R configs to `r/`
-- [ ] Add symlinks to setup.sh (R, SSH, latexmk)
-- [ ] Add Homebrew bundle to setup.sh
+- [x] Migrate zsh topic configs (git.zsh, python.zsh, r.zsh, macos.zsh, node.zsh)
+- [x] Migrate git config to `git/config` (modernized)
+- [x] Migrate SSH configs to `ssh/`
+- [x] Migrate R configs to `r/` and `radian/`
+- [x] Add Homebrew Brewfile to `system/`
+- [x] Test on current machine with new ZDOTDIR
+- [x] Push to GitHub
 - [ ] Set up secrets with 1Password CLI
 - [ ] Test fresh install on VM or second machine
 - [ ] Remove Dropbox sync
