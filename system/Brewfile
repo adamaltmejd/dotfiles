@@ -31,7 +31,7 @@ brew "git"
 # Languages
 brew "python3"
 brew "uv"
-brew "bun"
+brew "oven-sh/bun/bun"
 
 # Documents
 brew "pandoc"
