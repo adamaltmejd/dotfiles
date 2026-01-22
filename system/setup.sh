@@ -5,6 +5,16 @@ set -e
 
 CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}"
 SCRIPT_DIR="${0:A:h}"
+BACKUP_DIR="$HOME/dotfiles-setup-backup-$(date +%Y%m%d-%H%M%S)"
+
+# Move existing file/folder to backup dir before overwriting
+backup_if_exists() {
+    local target="$1"
+    [[ -e "$target" || -L "$target" ]] || return 0
+    mkdir -p "$BACKUP_DIR"
+    mv "$target" "$BACKUP_DIR/"
+    echo "Backed up $target to $BACKUP_DIR/"
+}
 
 echo "Setting up dotfiles..."
 
@@ -34,6 +44,7 @@ mkdir -p "$HOME/.cache"
 
 # Write bootstrap ~/.zshenv
 echo "Writing bootstrap ~/.zshenv..."
+backup_if_exists "$HOME/.zshenv"
 cat > "$HOME/.zshenv" << 'EOF'
 #!/usr/bin/env zsh
 # Bootstrap XDG and ZDOTDIR - written by ~/.config/system/setup.sh
@@ -47,10 +58,7 @@ EOF
 
 # SSH configuration
 echo "Setting up SSH..."
-if [[ -d "$HOME/.ssh" ]]; then
-    mv "$HOME/.ssh" "$HOME/ssh-debug"
-    echo "Moved existing ~/.ssh to ~/ssh-debug"
-fi
+backup_if_exists "$HOME/.ssh"
 mkdir -p "$HOME/.ssh/sockets"
 chmod 700 "$HOME/.ssh"
 cat > "$HOME/.ssh/config" << 'EOF'
