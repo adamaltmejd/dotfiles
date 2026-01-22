@@ -7,13 +7,19 @@ CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}"
 SCRIPT_DIR="${0:A:h}"
 BACKUP_DIR="$HOME/dotfiles-setup-backup-$(date +%Y%m%d-%H%M%S)"
 
-# Move existing file/folder to backup dir before overwriting
-backup_if_exists() {
+# Write file, backing up existing if different
+# Usage: write_with_backup target < content  OR  write_with_backup target << 'EOF'
+write_with_backup() {
     local target="$1"
-    [[ -e "$target" || -L "$target" ]] || return 0
-    mkdir -p "$BACKUP_DIR"
-    mv "$target" "$BACKUP_DIR/"
-    echo "Backed up $target to $BACKUP_DIR/"
+    local new_content="$(cat)"
+    if [[ -e "$target" || -L "$target" ]]; then
+        if [[ ! -f "$target" || "$(cat "$target")" != "$new_content" ]]; then
+            mkdir -p "$BACKUP_DIR"
+            mv "$target" "$BACKUP_DIR/"
+            echo "Backed up $target to $BACKUP_DIR/"
+        fi
+    fi
+    printf '%s' "$new_content" > "$target"
 }
 
 echo "Setting up dotfiles..."
@@ -39,8 +45,7 @@ mkdir -p "$HOME/.cache"
 
 # Write bootstrap ~/.zshenv
 echo "Writing bootstrap ~/.zshenv..."
-backup_if_exists "$HOME/.zshenv"
-cat > "$HOME/.zshenv" << 'EOF'
+write_with_backup "$HOME/.zshenv" << 'EOF'
 #!/usr/bin/env zsh
 # Bootstrap XDG and ZDOTDIR - written by ~/.config/system/setup.sh
 export XDG_CONFIG_HOME="$HOME/.config"
@@ -53,10 +58,9 @@ EOF
 
 # SSH configuration
 echo "Setting up SSH..."
-backup_if_exists "$HOME/.ssh"
 mkdir -p "$HOME/.ssh/sockets"
 chmod 700 "$HOME/.ssh"
-cat > "$HOME/.ssh/config" << 'EOF'
+write_with_backup "$HOME/.ssh/config" << 'EOF'
 Include ~/.config/ssh/config
 EOF
 chmod 600 "$HOME/.ssh/config"
