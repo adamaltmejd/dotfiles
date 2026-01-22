@@ -30,11 +30,6 @@ echo "Installing Homebrew packages..."
 brew bundle --file="$SCRIPT_DIR/Brewfile"
 brew cleanup
 
-echo ""
-echo "Log in to installed services (1Password, etc.) before continuing."
-echo "Press Enter when ready..."
-read
-
 # Create XDG directories
 echo "Creating XDG directories..."
 mkdir -p "$HOME/.local/bin"
@@ -66,13 +61,6 @@ Include ~/.config/ssh/config
 EOF
 chmod 600 "$HOME/.ssh/config"
 
-# Inject SSH config from 1Password
-if command -v op &>/dev/null; then
-    echo "Injecting SSH config from 1Password..."
-    op read "op://Work/ir2amtuqlhxc6oyaxhgwiixum4/ssh config" --out-file "$CONFIG_DIR/ssh/config.d/SOFI.local"
-    chmod 600 "$CONFIG_DIR/ssh/config.d/SOFI.local"
-fi
-
 # Build sk-libfido2.dylib for macOS built-in SSH FIDO2 support
 [[ -f /usr/local/lib/sk-libfido2.dylib ]] || "$CONFIG_DIR/ssh/build-sk-libfido2.sh"
 
@@ -87,5 +75,23 @@ ln -sf "$CONFIG_DIR/r/Makevars" "$HOME/.R/Makevars"
 
 # Suppress login message
 touch "$HOME/.hushlogin"
+
+# Check for 1Password CLI and inject SSH config
+if ! command -v op &>/dev/null; then
+    echo ""
+    echo "Log in to 1Password and enable the CLI integration before continuing."
+    echo "Press Enter when ready..."
+    read
+    if ! command -v op &>/dev/null; then
+        echo "Warning: 1Password CLI (op) not found. Skipping SSH config injection."
+        echo "Run 'op read \"op://Work/ir2amtuqlhxc6oyaxhgwiixum4/ssh config\" --out-file \"$CONFIG_DIR/ssh/config.d/SOFI.local\"' manually after setting up 1Password."
+    fi
+fi
+
+if command -v op &>/dev/null; then
+    echo "Injecting SSH config from 1Password..."
+    op read "op://Work/ir2amtuqlhxc6oyaxhgwiixum4/ssh config" --out-file "$CONFIG_DIR/ssh/config.d/SOFI.local"
+    chmod 600 "$CONFIG_DIR/ssh/config.d/SOFI.local"
+fi
 
 echo "Setup complete. Restart your shell with: exec zsh"
