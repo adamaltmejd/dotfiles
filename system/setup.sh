@@ -24,6 +24,21 @@ write_with_backup() {
 
 echo "Setting up dotfiles..."
 
+# Ensure git remote uses SSH
+if command -v git &>/dev/null; then
+    if git -C "$CONFIG_DIR" rev-parse --is-inside-work-tree &>/dev/null; then
+        origin_url="$(git -C "$CONFIG_DIR" remote get-url origin 2>/dev/null || true)"
+        if [[ "$origin_url" == http://* || "$origin_url" == https://* ]]; then
+            host_and_path="${origin_url#*://}"
+            host="${host_and_path%%/*}"
+            repo_path="${host_and_path#*/}"
+            ssh_url="git@${host}:${repo_path}"
+            echo "Updating git remote origin to SSH: $ssh_url"
+            git -C "$CONFIG_DIR" remote set-url origin "$ssh_url"
+        fi
+    fi
+fi
+
 # Install Homebrew if missing
 if ! command -v brew &>/dev/null; then
     echo "Installing Homebrew..."
