@@ -24,6 +24,7 @@ brew "fzf"
 brew "tlrc"
 brew "delta"
 brew "terminal-notifier"
+brew "pinentry-mac"
 
 # Version control
 brew "git"
@@ -42,6 +43,7 @@ brew "libpng"
 brew "jpeg-turbo"
 brew "freetype"
 brew "openssl"
+brew "mbedtls"
 brew "zstd"
 
 # Casks
