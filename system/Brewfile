@@ -45,6 +45,7 @@ brew "openssl"
 brew "zstd"
 
 # Casks
+cask "1password-cli"
 cask "1password"
 cask "dropbox"
 cask "alfred"
