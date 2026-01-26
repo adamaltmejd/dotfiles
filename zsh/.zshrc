@@ -11,19 +11,29 @@ for conf in "$ZDOTDIR"/conf.d/*.zsh(N); do
     source "$conf"
 done
 
-# Load secrets via 1Password CLI (cached until reboot)
+# Auto-load secrets via 1Password CLI (cached until reboot)
 if (( $+commands[op] )); then
     _cache="${TMPDIR}zsh-secrets"
-    _src="$ZDOTDIR/secrets.zsh"
+    _src="$ZDOTDIR/autoloaded_secrets.zsh"
 
     # Refresh if missing or secrets.zsh was modified
     if [[ ! -r "$_cache" || "$_src" -nt "$_cache" ]] && op inject --in-file "$_src" --out-file "$_cache.tmp" 2>/dev/null; then
         chmod 600 "$_cache.tmp" && mv "$_cache.tmp" "$_cache"
     fi
-
+    
     [[ -r "$_cache" ]] && source "$_cache"
     unset _cache _src
 fi
+
+# Lazy-load secrets on demand via load_secrets()
+load_secrets() {
+    if (( $+commands[op] )); then
+        source <(op inject --in-file "$ZDOTDIR/lazy_secrets.zsh")
+    else
+        echo "1Password CLI (op) not found." >&2
+        return 1
+    fi
+}
 
 #
 # Antidote plugin manager
