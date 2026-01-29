@@ -65,5 +65,6 @@ fi
 #
 # Tool integrations
 #
+eval "$(direnv hook zsh)"
 eval "$(zoxide init zsh)"
 source <(fzf --zsh)

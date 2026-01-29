@@ -33,6 +33,7 @@ brew "git"
 brew "python3"
 brew "uv"
 brew "oven-sh/bun/bun"
+brew "direnv"
 
 # Documents
 brew "pandoc"
