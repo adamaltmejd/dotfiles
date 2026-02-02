@@ -114,5 +114,9 @@ if command -v op &>/dev/null; then
     chmod 600 "$CONFIG_DIR/ssh/config.d/SOFI.local"
 fi
 
+# Apply macOS defaults
+echo "Applying macOS defaults..."
+"$SCRIPT_DIR/defaults.sh"
+
 echo "Setup complete. Restarting shell..."
 exec zsh
