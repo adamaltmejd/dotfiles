@@ -28,6 +28,7 @@ brew "pinentry-mac"
 
 # Version control
 brew "git"
+brew "gh"
 
 # Languages
 brew "python3"
