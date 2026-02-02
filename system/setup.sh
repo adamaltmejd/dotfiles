@@ -48,8 +48,9 @@ fi
 
 # Install packages from Brewfile
 echo "Installing Homebrew packages..."
-brew update && brew upgrade
-brew bundle --file="$SCRIPT_DIR/Brewfile"
+brew update
+brew upgrade
+brew bundle --verbose --file="$SCRIPT_DIR/Brewfile"
 brew cleanup
 
 # Create XDG directories
