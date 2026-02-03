@@ -136,19 +136,23 @@ bindkey '^[[B' history-beginning-search-forward   # Down
 #
 
 # Modern ls (eza)
-alias ls="eza"
-alias l="eza -l"
-alias la="eza -la"
-alias ll="eza -l"
-alias lsd="eza -lD"
-alias tree="eza --tree"
+if (( $+commands[eza] )); then
+    alias ls="eza"
+    alias l="eza -l"
+    alias la="eza -la"
+    alias ll="eza -l"
+    alias lsd="eza -lD"
+    alias tree="eza --tree"
+fi
 
 # Modern cat (bat)
-alias cat="bat --paging=never"
+if (( $+commands[bat] )); then
+    alias cat="bat --paging=never"
 
-# Use bat as man pager
-export MANPAGER="sh -c 'col -bx | bat -l man -p'"
-export MANROFFOPT="-c"
+    # Use bat as man pager
+    export MANPAGER="sh -c 'col -bx | bat -l man -p'"
+    export MANROFFOPT="-c"
+fi
 
 # Grep with color
 alias grep='grep --color=auto'
@@ -179,6 +183,7 @@ o() {
 
 # File/directory size
 fs() {
+    setopt local_options null_glob
     if du -b /dev/null &>/dev/null; then
         local arg=-sbh
     else
@@ -198,12 +203,15 @@ echoerr() {
 
 # Fuzzy-find man pages
 fman() {
-    man -k . | fzf --preview 'man {1}' | awk '{print $1}' | xargs -r man
+    local page
+    page="$(man -k . | fzf --preview 'man {1}' | awk '{print $1}' | head -n 1)"
+    [[ -n "$page" ]] && man "$page"
 }
 
 # Erase current session history
 erase_history() {
-    local HISTSIZE=0
+    builtin history -c
+    : >| "$HISTFILE"
 }
 
 zshaddhistory_erase_history() {

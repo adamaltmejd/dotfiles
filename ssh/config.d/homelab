@@ -3,8 +3,8 @@ Host 10.?.40.* 10.?.50.* !10.?.50.2
     Port 22
     IdentityFile ~/.ssh/id_home
     PasswordAuthentication no
-    StrictHostKeyChecking no
-    UserKnownHostsFile /dev/null
+    StrictHostKeyChecking accept-new
+    UserKnownHostsFile ~/.ssh/known_hosts_homelab
     LogLevel ERROR
 
 # Breven Homelab VMs login as adam (10.1.40.2-9)

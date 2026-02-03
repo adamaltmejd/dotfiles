@@ -28,8 +28,8 @@ if [[ -n $SSH_CONNECTION ]]; then
     export EDITOR="vi"
     export VISUAL="vi"
 else
-    export EDITOR="code"
-    export VISUAL="code"
+    export EDITOR="code --wait"
+    export VISUAL="code --wait"
 fi
 
 [[ "$OSTYPE" == darwin* ]] && export BROWSER="open"

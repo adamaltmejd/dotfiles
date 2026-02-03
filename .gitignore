@@ -46,6 +46,7 @@ zsh/plugins.zsh
 zsh/.zcompdump*
 zsh/conf.d/local.zsh
 git/config.local
+gh/hosts.yml
 
 # Common junk
 .DS_Store

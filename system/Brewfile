@@ -29,6 +29,8 @@ brew "mole"
 
 # Version control
 brew "git"
+brew "git-lfs"
+brew "git-filter-repo"
 brew "gh"
 
 # Languages

@@ -100,7 +100,7 @@ touch "$HOME/.hushlogin"
 # Check for 1Password CLI and inject SSH config
 if ! command -v op &>/dev/null; then
     echo ""
-    echo "Log in to 1Password and enable the CLI integration before continuing."
+    echo "1Password CLI (op) not found. Install it and sign in before continuing."
     echo "Press Enter when ready..."
     read
     if ! command -v op &>/dev/null; then
@@ -110,9 +110,27 @@ if ! command -v op &>/dev/null; then
 fi
 
 if command -v op &>/dev/null; then
-    echo "Injecting SSH config from 1Password..."
-    op read "op://Work/ir2amtuqlhxc6oyaxhgwiixum4/ssh config" --out-file "$CONFIG_DIR/ssh/config.d/SOFI.local"
-    chmod 600 "$CONFIG_DIR/ssh/config.d/SOFI.local"
+    if ! op whoami &>/dev/null; then
+        echo "1Password CLI installed but not signed in. Starting sign-in..."
+        set +e
+        eval "$(op signin)"
+        signin_status=$?
+        set -e
+        if (( signin_status != 0 )); then
+            echo "Warning: 1Password sign-in failed or was canceled. Skipping SSH config injection."
+        fi
+    fi
+
+    if op whoami &>/dev/null; then
+        echo "Injecting SSH config from 1Password..."
+        if op read "op://Work/ir2amtuqlhxc6oyaxhgwiixum4/ssh config" --out-file "$CONFIG_DIR/ssh/config.d/SOFI.local"; then
+            chmod 600 "$CONFIG_DIR/ssh/config.d/SOFI.local"
+        else
+            echo "Warning: Failed to read SSH config from 1Password. Skipping injection."
+        fi
+    else
+        echo "Warning: 1Password CLI not signed in or locked. Skipping SSH config injection."
+    fi
 fi
 
 # Apply macOS defaults

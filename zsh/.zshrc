@@ -40,12 +40,16 @@ load_secrets() {
 #
 zsh_plugins="$ZDOTDIR/plugins"
 [[ -f "${zsh_plugins}.txt" ]] || touch "${zsh_plugins}.txt"
-fpath=(/opt/homebrew/opt/antidote/share/antidote/functions $fpath)
-autoload -Uz antidote
-if [[ ! "${zsh_plugins}.zsh" -nt "${zsh_plugins}.txt" ]]; then
-    antidote bundle <"${zsh_plugins}.txt" >|"${zsh_plugins}.zsh"
+if [[ -d /opt/homebrew/opt/antidote/share/antidote/functions ]]; then
+    fpath=(/opt/homebrew/opt/antidote/share/antidote/functions $fpath)
+    autoload -Uz antidote
+    if (( $+functions[antidote] )); then
+        if [[ ! "${zsh_plugins}.zsh" -nt "${zsh_plugins}.txt" ]]; then
+            antidote bundle <"${zsh_plugins}.txt" >|"${zsh_plugins}.zsh"
+        fi
+        source "${zsh_plugins}.zsh"
+    fi
 fi
-source "${zsh_plugins}.zsh"
 
 #
 # Completions
@@ -65,6 +69,12 @@ fi
 #
 # Tool integrations
 #
-eval "$(direnv hook zsh)"
-eval "$(zoxide init zsh)"
-source <(fzf --zsh)
+if (( $+commands[direnv] )); then
+    eval "$(direnv hook zsh)"
+fi
+if (( $+commands[zoxide] )); then
+    eval "$(zoxide init zsh)"
+fi
+if (( $+commands[fzf] )); then
+    source <(fzf --zsh)
+fi

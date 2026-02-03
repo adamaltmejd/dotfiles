@@ -3,7 +3,7 @@
 
 # Connection multiplexing
 ControlMaster auto
-ControlPath ~/.ssh/sockets/%r@%h:%p
+ControlPath ~/.ssh/sockets/%C
 ControlPersist 1800
 
 # Default settings for all hosts
@@ -14,4 +14,4 @@ Host *
     ServerAliveInterval 60
 
 # Additional hosts configurations in config.d
-Include /Users/adam/.config/ssh/config.d/*
+Include ~/.config/ssh/config.d/*

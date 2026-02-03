@@ -1,7 +1,7 @@
 [user]
 	name = Adam Altmejd
 	email = adam@altmejd.se
-	signingkey = ~/.ssh/id_github.pub
+	signingkey = ~/.ssh/id_github
 
 [core]
 	editor = code --wait
@@ -90,4 +90,3 @@
 
 [init]
 	defaultBranch = main
-
