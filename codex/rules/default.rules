@@ -1,0 +1,3 @@
+prefix_rule(pattern=["uv", "run", "ruff", "check"], decision="allow")
+prefix_rule(pattern=["uv", "run", "pytest"], decision="allow")
+prefix_rule(pattern=["uv", "run", "ruff", "format"], decision="allow")

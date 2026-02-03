@@ -7,19 +7,16 @@ CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}"
 SCRIPT_DIR="${0:A:h}"
 BACKUP_DIR="$HOME/dotfiles-setup-backup-$(date +%Y%m%d-%H%M%S)"
 
-# Write file, backing up existing if different
-# Usage: write_with_backup target < content  OR  write_with_backup target << 'EOF'
-write_with_backup() {
-    local target="$1"
-    local new_content="$(cat)"
-    if [[ -e "$target" || -L "$target" ]]; then
-        if [[ ! -f "$target" || "$(cat "$target")" != "$new_content" ]]; then
-            mkdir -p "$BACKUP_DIR"
-            mv "$target" "$BACKUP_DIR/"
-            echo "Backed up $target to $BACKUP_DIR/"
-        fi
+# Set up a managed file, backing up existing if different
+# Usage: setup link source target
+#        setup write target < content
+setup() {
+    local mode="$1" target source content
+    [[ "$mode" == "link" ]] && { source="$2"; target="$3"; content="$(cat "$source")"; } || { target="$2"; content="$(cat)"; }
+    if [[ -e "$target" && ! -L "$target" && "$(cat "$target")" != "$content" ]]; then
+        mkdir -p "$BACKUP_DIR"; mv "$target" "$BACKUP_DIR/"; echo "Backed up $target"
     fi
-    printf '%s' "$new_content" > "$target"
+    [[ "$mode" == "link" ]] && ln -sf "$source" "$target" || printf '%s' "$content" > "$target"
 }
 
 echo "Setting up dotfiles..."
@@ -62,7 +59,7 @@ mkdir -p "$HOME/.cache"
 
 # Write bootstrap ~/.zshenv
 echo "Writing bootstrap ~/.zshenv..."
-write_with_backup "$HOME/.zshenv" << 'EOF'
+setup write "$HOME/.zshenv" << 'EOF'
 #!/usr/bin/env zsh
 # Bootstrap XDG and ZDOTDIR - written by ~/.config/system/setup.sh
 export XDG_CONFIG_HOME="$HOME/.config"
@@ -77,7 +74,7 @@ EOF
 echo "Setting up SSH..."
 mkdir -p "$HOME/.ssh/sockets"
 chmod 700 "$HOME/.ssh"
-write_with_backup "$HOME/.ssh/config" << 'EOF'
+setup write "$HOME/.ssh/config" << 'EOF'
 Include ~/.config/ssh/config
 EOF
 chmod 600 "$HOME/.ssh/config"
@@ -88,11 +85,22 @@ chmod 600 "$HOME/.ssh/config"
 # R configuration (R doesn't support XDG, needs symlinks)
 echo "Setting up R..."
 mkdir -p "$HOME/.R"
-ln -sf "$CONFIG_DIR/r/Rprofile" "$HOME/.Rprofile"
-ln -sf "$CONFIG_DIR/r/Renviron" "$HOME/.Renviron"
-ln -sf "$CONFIG_DIR/r/lintr" "$HOME/.lintr"
-ln -sf "$CONFIG_DIR/r/Makevars" "$HOME/.R/Makevars"
+setup link "$CONFIG_DIR/r/Rprofile" "$HOME/.Rprofile"
+setup link "$CONFIG_DIR/r/Renviron" "$HOME/.Renviron"
+setup link "$CONFIG_DIR/r/lintr" "$HOME/.lintr"
+setup link "$CONFIG_DIR/r/Makevars" "$HOME/.R/Makevars"
 # Note: radian uses XDG natively ($XDG_CONFIG_HOME/radian/profile)
+
+# Claude Code configuration
+echo "Setting up Claude Code..."
+mkdir -p "$HOME/.claude"
+setup link "$CONFIG_DIR/claude/settings.json" "$HOME/.claude/settings.json"
+
+# Codex configuration
+echo "Setting up Codex..."
+mkdir -p "$HOME/.codex/rules"
+setup link "$CONFIG_DIR/codex/config.toml" "$HOME/.codex/config.toml"
+setup link "$CONFIG_DIR/codex/rules/default.rules" "$HOME/.codex/rules/default.rules"
 
 # Suppress login message
 touch "$HOME/.hushlogin"

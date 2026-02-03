@@ -37,6 +37,14 @@
 !ghostty/
 !ghostty/**
 
+# Claude Code
+!claude/
+!claude/**
+
+# Codex CLI
+!codex/
+!codex/**
+
 # System files
 !system/
 !system/**
