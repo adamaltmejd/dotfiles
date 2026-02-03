@@ -1,0 +1,5 @@
+# Pre-rellease builds for claude memory leak fix
+auto-update-channel = tip
+
+shell-integration = zsh
+shell-integration-features = true

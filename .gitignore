@@ -11,9 +11,11 @@
 !zsh/
 !zsh/**
 
-# Git configuration
+# Git+Github configuration
 !git/
 !git/**
+!gh/
+!gh/**
 
 # SSH configuration
 !ssh/
@@ -30,6 +32,10 @@
 # Ansible
 !ansible/
 !ansible/**
+
+# Ghostty
+!ghostty/
+!ghostty/**
 
 # System files
 !system/
