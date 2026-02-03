@@ -117,6 +117,9 @@ defaults write com.apple.dock mineffect -string "scale"
 # Don't show recent applications in Dock
 defaults write com.apple.dock show-recents -bool false
 
+# Clear all default dock items
+defaults write com.apple.dock persistent-apps -array
+
 # Auto-hide the Dock
 defaults write com.apple.dock autohide -bool true
 
