@@ -5,3 +5,8 @@
 gdiff() {
     git diff --no-index --color-words "$@"
 }
+
+# cd to repository root
+cdr() {
+    cd "$(git rev-parse --show-toplevel)" || return 1
+}
