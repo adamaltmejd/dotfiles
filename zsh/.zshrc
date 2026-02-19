@@ -1,11 +1,6 @@
 #!/usr/bin/env zsh
 # Interactive shell configuration
 
-# Powerlevel10k instant prompt (must be near top)
-if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
-    source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
-fi
-
 # Load shell options, completion styles, key bindings
 for conf in "$ZDOTDIR"/conf.d/*.zsh(N); do
     source "$conf"
@@ -62,13 +57,33 @@ else
 fi
 
 #
-# Powerlevel10k prompt
-#
-[[ -f "$ZDOTDIR/.p10k.zsh" ]] && source "$ZDOTDIR/.p10k.zsh"
-
-#
 # Tool integrations
 #
+if (( $+commands[starship] )); then
+    eval "$(starship init zsh)"
+
+    # Transient prompt — collapse previous prompts to ❯
+    zle-line-init() {
+        [[ $CONTEXT == start ]] || return 0
+        while true; do
+            zle .recursive-edit
+            local -i ret=$?
+            [[ $ret == 0 && $KEYS == $'\4' ]] || break
+            [[ -o ignore_eof ]] || exit 0
+        done
+        local saved_prompt=$PROMPT saved_rprompt=$RPROMPT
+        PROMPT='%(?.%F{green}.%F{red})❯%f ' RPROMPT=''
+        zle .reset-prompt
+        PROMPT=$saved_prompt RPROMPT=$saved_rprompt
+        if (( ret )); then
+            zle .send-break
+        else
+            zle .accept-line
+        fi
+        return ret
+    }
+    zle -N zle-line-init
+fi
 if (( $+commands[direnv] )); then
     eval "$(direnv hook zsh)"
 fi

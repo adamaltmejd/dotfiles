@@ -58,4 +58,5 @@ export SSH_ASKPASS="$XDG_CONFIG_HOME/ssh/ssh-askpass"
 #
 # Additional configs
 #
+export STARSHIP_CONFIG="$XDG_CONFIG_HOME/zsh/starship.toml"
 export ANSIBLE_VAULT_PASSWORD_FILE="$XDG_CONFIG_HOME/ansible/vault-password-file"
