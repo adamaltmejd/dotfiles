@@ -3,3 +3,5 @@ auto-update-channel = tip
 
 shell-integration = zsh
 shell-integration-features = true
+
+theme = Gruvbox Dark Hard

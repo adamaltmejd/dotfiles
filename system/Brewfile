@@ -13,6 +13,7 @@ brew "libfido2"
 # Shell and CLI
 brew "zsh"
 brew "antidote"
+brew "starship"
 
 # Modern CLI tools
 brew "eza"

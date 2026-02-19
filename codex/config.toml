@@ -1,13 +1,20 @@
-model = "gpt-5.2-codex"
+model = "gpt-5.3-codex"
 model_reasoning_effort = "xhigh"
 personality = "pragmatic"
+sandbox_mode = "workspace-write"
 
 [features]
 unified_exec = true
-web_search_request = true
-collab = true
+multi_agent = true
 steer = true
 shell_snapshot = true
 
 [sandbox_workspace_write]
 network_access = true
+
+[projects."/Users/adam/Code/sun2000_coding"]
+trust_level = "trusted"
+[projects."/Users/adam/Library/Mobile Documents/iCloud~md~obsidian/Documents/Growbot"]
+trust_level = "trusted"
+[projects."/Users/adam/Library/Mobile Documents/iCloud~md~obsidian/Documents/Main"]
+trust_level = "trusted"
