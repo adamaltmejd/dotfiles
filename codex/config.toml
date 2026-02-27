@@ -8,6 +8,8 @@ unified_exec = true
 multi_agent = true
 steer = true
 shell_snapshot = true
+prevent_idle_sleep = true
+apps = true
 
 [sandbox_workspace_write]
 network_access = true
