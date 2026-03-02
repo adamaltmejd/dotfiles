@@ -60,3 +60,6 @@ export SSH_ASKPASS="$XDG_CONFIG_HOME/ssh/ssh-askpass"
 #
 export STARSHIP_CONFIG="$XDG_CONFIG_HOME/zsh/starship.toml"
 export ANSIBLE_VAULT_PASSWORD_FILE="$XDG_CONFIG_HOME/ansible/vault-password-file"
+
+# UV Cache needs to go in /tmp instead of ~/.cache for codex sandboxing to not error
+export UV_CACHE_DIR=/tmp/uv-cache
