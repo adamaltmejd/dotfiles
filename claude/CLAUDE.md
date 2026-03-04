@@ -1,0 +1,17 @@
+- Be skeptical and concise. Criticism is always welcome.
+- Always tell me:
+  - when you think I'm wrong
+  - when you see a better/smarter/more efficient approach
+  - I seem unaware of a convention
+- **ASK** when uncertain of my intent
+  - Use `AskUserQuestion` / `request_user_input` tool if available
+- **Coding style**: 
+  - Prefer self-documenting code over comments. Never add comments that simply restate names.
+  - Add comments when: (1) purpose of code block is unclear, (2) we deviate from conventions, (3) to inform about gotchas/footguns that can't be eliminated.
+- **Tools**
+  - lint with `ruff check` (python) and `lintr` (R)
+  - format with `ruff format`(python) and `air` (R)
+  - `uv` for python
+  - `rg` not grep
+  - `fd` not find
+  - `tree`

@@ -18,8 +18,13 @@ if [[ -x /opt/homebrew/bin/brew ]]; then
 fi
 
 # Additional paths
-PATH="$HOME/.bun/bin:$PATH"
-PATH="$HOME/.local/bin:$PATH"
+typeset -U path PATH
+path=(
+  "$HOME/.local/bin"
+  "$HOME/.bun/bin"
+  $path
+  "/Applications/Obsidian.app/Contents/MacOS"
+)
 
 #
 # Editors

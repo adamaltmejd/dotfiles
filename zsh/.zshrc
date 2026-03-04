@@ -12,12 +12,16 @@ if (( $+commands[op] )); then
     _src="$ZDOTDIR/autoloaded_secrets.zsh"
 
     # Refresh if missing or secrets.zsh was modified
-    if [[ ! -r "$_cache" || "$_src" -nt "$_cache" ]] && op inject --in-file "$_src" --out-file "$_cache.tmp" 2>/dev/null; then
-        chmod 600 "$_cache.tmp" && mv "$_cache.tmp" "$_cache"
+    if [[ ! -r "$_cache" || "$_src" -nt "$_cache" ]]; then
+        _tmp="$(mktemp "${TMPDIR}zsh-secrets.XXXXXX" 2>/dev/null)"
+        if [[ -n "$_tmp" ]] && op inject --force --in-file "$_src" --out-file "$_tmp" 2>/dev/null; then
+            chmod 600 "$_tmp" && mv "$_tmp" "$_cache"
+        fi
+        [[ -n "$_tmp" && -e "$_tmp" ]] && rm -f "$_tmp"
     fi
     
     [[ -r "$_cache" ]] && source "$_cache"
-    unset _cache _src
+    unset _cache _src _tmp
 fi
 
 # Lazy-load secrets on demand via load_secrets()

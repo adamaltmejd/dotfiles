@@ -42,6 +42,22 @@ mkdir -p "$HOME/.local/share"
 mkdir -p "$HOME/.local/state/zsh"
 mkdir -p "$HOME/.cache"
 
+# Force uv workflows for Python packaging
+echo "Installing Python shims..."
+setup write "$HOME/.local/bin/python" << 'EOF'
+#!/usr/bin/env sh
+echo "Blocked: use 'uv run python ...' (or python3)." >&2
+exit 1
+EOF
+chmod 755 "$HOME/.local/bin/python"
+
+setup write "$HOME/.local/bin/pip" << 'EOF'
+#!/usr/bin/env sh
+exec uv pip "$@"
+EOF
+chmod 755 "$HOME/.local/bin/pip"
+ln -sf "$HOME/.local/bin/pip" "$HOME/.local/bin/pip3"
+
 # Write bootstrap ~/.zshenv
 echo "Writing bootstrap ~/.zshenv..."
 setup write "$HOME/.zshenv" << 'EOF'
@@ -80,12 +96,14 @@ setup link "$CONFIG_DIR/r/Makevars" "$HOME/.R/Makevars"
 echo "Setting up Claude Code..."
 mkdir -p "$HOME/.claude"
 setup link "$CONFIG_DIR/claude/settings.json" "$HOME/.claude/settings.json"
+setup link "$CONFIG_DIR/claude/CLAUDE.md" "$HOME/.claude/CLAUDE.md"
 
 # Codex configuration
 echo "Setting up Codex..."
 mkdir -p "$HOME/.codex/rules"
 setup link "$CONFIG_DIR/codex/config.toml" "$HOME/.codex/config.toml"
 setup link "$CONFIG_DIR/codex/rules/default.rules" "$HOME/.codex/rules/default.rules"
+setup link "$CONFIG_DIR/codex/AGENTS.md" "$HOME/.codex/AGENTS.md"
 
 # Suppress login message
 touch "$HOME/.hushlogin"
