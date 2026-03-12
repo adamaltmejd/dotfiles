@@ -1,0 +1,4 @@
+# Server-focused packages.
+# Keep this lean and low-friction for remote hosts.
+
+htop
