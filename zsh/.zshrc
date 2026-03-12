@@ -1,6 +1,16 @@
 #!/usr/bin/env zsh
 # Interactive shell configuration
 
+#
+# Profile feature flags (loaded early so conf.d files can use feat())
+#
+_profile="${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/profile"
+[[ -r "$_profile" ]] && source "$_profile"
+unset _profile
+
+# feat <name> — check if a feature is enabled in the profile
+feat() { local _v=DOTFILES_FEAT_${(U)1}; (( ${(P)_v:-0} )) }
+
 # Load shell options, completion styles, key bindings
 for conf in "$ZDOTDIR"/conf.d/*.zsh(N); do
     source "$conf"
@@ -19,7 +29,7 @@ if (( $+commands[op] )); then
         fi
         [[ -n "$_tmp" && -e "$_tmp" ]] && rm -f "$_tmp"
     fi
-    
+
     [[ -r "$_cache" ]] && source "$_cache"
     unset _cache _src _tmp
 fi
@@ -63,7 +73,7 @@ fi
 #
 # Tool integrations
 #
-if (( $+commands[starship] )); then
+if feat starship && (( $+commands[starship] )); then
     eval "$(starship init zsh)"
 
     # Transient prompt — collapse previous prompts to ❯
@@ -88,12 +98,19 @@ if (( $+commands[starship] )); then
     }
     zle -N zle-line-init
 fi
-if (( $+commands[direnv] )); then
+if feat direnv && (( $+commands[direnv] )); then
     eval "$(direnv hook zsh)"
 fi
-if (( $+commands[zoxide] )); then
+if feat smartcli && (( $+commands[zoxide] )); then
     eval "$(zoxide init zsh)"
 fi
-if (( $+commands[fzf] )); then
+if feat smartcli && (( $+commands[fzf] )); then
     source <(fzf --zsh)
 fi
+
+#
+# Host-local override (loaded last, wins on conflicts)
+#
+_host_local="${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/host.local"
+[[ -r "$_host_local" ]] && source "$_host_local"
+unset _host_local

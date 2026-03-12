@@ -2,14 +2,17 @@
 # Sourced on all shell invocations. Sets environment variables only.
 # This file is sourced by the bootstrap ~/.zshenv after XDG vars are set.
 
-# By default /etc/zprofile is loaded after ~/.zshenv, and /usr/libexec/path_helper resets path
-unsetopt GLOBAL_RCS # disabled /etc/zprofile loading
+# On macOS, /etc/zprofile runs path_helper which resets PATH order.
+# Disable global rc files and call path_helper ourselves first.
+if [[ "$OSTYPE" == darwin* ]]; then
+  unsetopt GLOBAL_RCS
+fi
 
 #
 # PATH
 #
-# Apple defaults
-if [[ -x /opt/homebrew/bin/brew ]]; then
+# Apple system paths
+if [[ -x /usr/libexec/path_helper ]]; then
   eval $(/usr/libexec/path_helper -s)
 fi
 # Homebrew
@@ -57,8 +60,10 @@ export LESS="--raw-control-chars --ignore-case --squeeze-blank-lines --hilite-un
 #
 # SSH (YubiKey FIDO support)
 #
-export SSH_SK_PROVIDER=/usr/local/lib/sk-libfido2.dylib
-export SSH_ASKPASS="$XDG_CONFIG_HOME/ssh/ssh-askpass"
+if [[ "$OSTYPE" == darwin* ]]; then
+    export SSH_SK_PROVIDER=/usr/local/lib/sk-libfido2.dylib
+    export SSH_ASKPASS="$XDG_CONFIG_HOME/ssh/ssh-askpass"
+fi
 
 #
 # Additional configs
