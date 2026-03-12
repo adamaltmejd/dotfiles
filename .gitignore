@@ -6,6 +6,7 @@
 !README.md
 !CLAUDE.md
 !PLAN.md
+!bootstrap.sh
 
 # Zsh configuration
 !zsh/
@@ -43,9 +44,17 @@
 !agents/
 !agents/**
 
-# System files
-!system/
-!system/**
+# macOS helper files
+!macos/
+!macos/**
+
+# Bootstrap internals and docs
+!bootstrap/
+!bootstrap/**
+!docs/
+!docs/**
+!legacy/
+!legacy/README.md
 
 # Ignore generated/local files within tracked dirs
 zsh/plugins.zsh

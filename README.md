@@ -1,63 +1,76 @@
 # Dotfiles
 
-XDG-compliant dotfiles for macOS. This repository is designed to be cloned directly to `~/.config`.
+XDG-compliant dotfiles for macOS and Linux. The default `XDG_CONFIG_HOME` is `~/.config`, but custom paths are supported.
 
 ## Quick Start
 
 ```zsh
-# 1. Install Xcode CLI tools
+# 1. Install Xcode CLI tools (macOS)
 xcode-select --install
 
-# 2. Clone directly to ~/.config
+# 2. Clone (default path)
 git clone https://github.com/adamaltmejd/dotfiles.git ~/.config
 
-# 3. Run setup
-~/.config/system/setup.sh
+# 3. Preview then apply (local profile)
+~/.config/bootstrap.sh --profile local --dry-run
+~/.config/bootstrap.sh --profile local --apply
 
 # 4. Restart shell
 exec zsh
 ```
 
-## Structure
+## Setup Entry Point
 
+`bootstrap.sh` is the only supported setup entrypoint.
+
+```zsh
+# Server
+./bootstrap.sh --profile server --dry-run
+./bootstrap.sh --profile server --apply
+
+# Local
+./bootstrap.sh --profile local --dry-run
+./bootstrap.sh --profile local --apply
 ```
-~/.config/                      # This repo
-├── zsh/                        # ZDOTDIR - all zsh config
-│   ├── .zshrc
-│   ├── .zshenv
-│   ├── .p10k.zsh
-│   ├── plugins.txt             # Antidote plugins
-│   ├── secrets.zsh             # 1Password secrets loader
-│   └── conf.d/                 # Topic-based configs
-│       ├── core.zsh
-│       ├── git.zsh
-│       ├── macos.zsh
-│       ├── node.zsh
-│       ├── python.zsh
-│       └── r.zsh
-├── git/                        # Git config (XDG native)
-│   ├── config
-│   └── ignore
-├── r/                          # R configs (symlinked to ~/)
-│   ├── Rprofile
-│   ├── Renviron
-│   ├── Makevars
-│   └── lintr
-├── radian/                     # Radian R console config
-│   └── profile
-├── ssh/                        # SSH config (included by ~/.ssh/config)
-│   ├── config
-│   └── config.d/
-├── ansible/                    # Ansible config
-│   └── vault-password-file
-└── system/                     # Setup scripts, Brewfile
-    ├── setup.sh
-    └── Brewfile
+
+## Profiles
+
+- `local`: desktop/laptop defaults, includes `claude/` and `codex/`, includes R dotfiles by default.
+- `server`: broadly useful server defaults, lighter shell footprint, skips R dotfiles by default.
+
+## Custom XDG_CONFIG_HOME
+
+Use `--xdg-config-home` if your repo is not at `~/.config`.
+
+```zsh
+/path/to/dotfiles/bootstrap.sh --profile local --xdg-config-home /path/to/dotfiles --dry-run
+/path/to/dotfiles/bootstrap.sh --profile local --xdg-config-home /path/to/dotfiles --apply
+```
+
+## Repository Layout
+
+```text
+dotfiles/
+├── bootstrap.sh                # setup entrypoint
+├── bootstrap/                  # bootstrap internals
+│   ├── lib/                    # detection/linking/package helpers
+│   └── packages/               # package manifests by profile
+├── zsh/                        # ZDOTDIR
+├── git/                        # git config
+├── ssh/                        # ssh config
+├── r/                          # R config sources
+├── radian/                     # radian config
+├── ansible/                    # ansible config
+├── gh/                         # GitHub CLI config
+├── ghostty/                    # ghostty config
+├── claude/                     # local-profile managed
+├── codex/                      # local-profile managed
+├── macos/                      # macOS helpers (apply-defaults.zsh, packages.Brewfile)
+├── docs/                       # local/server notes
+└── legacy/                     # migration snapshot (not active runtime config)
 ```
 
 ## XDG Base Directory
-
-This setup uses the XDG Base Directory Specification:
 
 | Variable | Location | Purpose |
 |----------|----------|---------|
@@ -66,16 +79,28 @@ This setup uses the XDG Base Directory Specification:
 | `XDG_STATE_HOME` | `~/.local/state` | User state (logs, history) |
 | `XDG_CACHE_HOME` | `~/.cache` | Non-essential cached data |
 
-## Files Outside ~/.config
+## Files Outside XDG Config
 
-Some tools don't support XDG. These are handled by `setup.sh`:
+Some tools do not support XDG config paths. These are managed by `bootstrap.sh`:
 
 | File | Purpose | How |
 |------|---------|-----|
-| `~/.zshenv` | Bootstrap ZDOTDIR | Written by setup.sh |
-| `~/.ssh/config` | SSH configuration | Includes `~/.config/ssh/config` |
+| `~/.zshenv` | Bootstrap ZDOTDIR + XDG vars | Written by bootstrap.sh |
+| `~/.ssh/config` | SSH include entrypoint | Includes `$DOTFILES_DIR/ssh/config` |
 | `~/.Rprofile` | R startup | Symlink to `r/Rprofile` |
 | `~/.Renviron` | R environment | Symlink to `r/Renviron` |
+
+Server profile note: R dotfiles are skipped by default on `--profile server`; use `--with-r` to opt in.
+
+## macOS Helpers
+
+```zsh
+# Install macOS packages and casks
+brew bundle --file ./macos/packages.Brewfile
+
+# Apply macOS defaults
+./macos/apply-defaults.zsh
+```
 
 ## Modern CLI Tools
 

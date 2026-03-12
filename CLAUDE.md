@@ -1,6 +1,6 @@
 # Claude Code Instructions
 
-XDG-compliant macOS dotfiles. This repo is cloned directly to `~/.config`.
+XDG-compliant macOS dotfiles. Default location is `~/.config` (`XDG_CONFIG_HOME`), with custom paths supported.
 
 ## Structure
 
@@ -15,14 +15,22 @@ XDG-compliant macOS dotfiles. This repo is cloned directly to `~/.config`.
 - `agents/claude/` - Claude Code settings (symlinked to ~/.claude/)
 - `agents/codex/` - Codex CLI config and rules (symlinked to ~/.codex/)
 - `agents/skills/` - Shared skills (symlinked to ~/.claude/skills and ~/.agents/skills)
-- `system/` - Brewfile, setup.sh
+- `macos/` - packages.Brewfile, apply-defaults.zsh
+- `bootstrap.sh` - profile-aware integration bootstrap entrypoint
+- `bootstrap/lib/` - bootstrap helper modules (detect/link/packages/common)
+- `bootstrap/packages/` - profile-scoped package manifests
+- `docs/` - migration notes for local/server profiles
 
 ## Key Files
 
 | File | Purpose |
 |------|---------|
-| `system/setup.sh` | Main setup script for new machines |
-| `system/Brewfile` | Homebrew packages and casks |
+| `bootstrap.sh` | Main setup script for new machines |
+| `macos/packages.Brewfile` | Homebrew packages and casks |
+| `macos/apply-defaults.zsh` | Apply macOS defaults |
+| `bootstrap/packages/packages.shared.txt` | Shared package manifest |
+| `bootstrap/packages/packages.local.txt` | Local profile package manifest |
+| `bootstrap/packages/packages.server.txt` | Server profile package manifest |
 | `zsh/.zshrc` | Interactive shell config |
 | `zsh/.zshenv` | Environment variables (sourced by bootstrap) |
 | `zsh/secrets.zsh` | 1Password secrets loader |
@@ -34,7 +42,8 @@ XDG-compliant macOS dotfiles. This repo is cloned directly to `~/.config`.
 
 ## Bootstrap
 
-A minimal `~/.zshenv` (written by setup.sh) sets XDG vars and ZDOTDIR, then sources `~/.config/zsh/.zshenv`.
+A minimal `~/.zshenv` (written by bootstrap.sh) sets XDG vars and ZDOTDIR, then sources `"$DOTFILES_DIR/zsh/.zshenv"`.
+`zsh/.zshrc` then loads `"$XDG_CONFIG_HOME/dotfiles/host.local"` last when present, so host-level overrides win.
 
 ## Editing Guidelines
 
@@ -43,7 +52,7 @@ A minimal `~/.zshenv` (written by setup.sh) sets XDG vars and ZDOTDIR, then sour
 - **Environment variables**: `zsh/.zshenv` for universal, `zsh/conf.d/*.zsh` for topic-specific
 - **Git config**: `git/config` (or `git/config.local` for machine-specific, gitignored)
 - **SSH hosts**: Add to `ssh/config.d/` for host-specific configs
-- **New tool config**: Create new directory if XDG-compliant, otherwise add symlink to setup.sh
+- **New tool config**: Create new directory if XDG-compliant, otherwise add symlink in `bootstrap.sh`
 - **Secrets**: Use 1Password CLI via `zsh/secrets.zsh`, never commit secrets
 
 ## Coding Guidelines
