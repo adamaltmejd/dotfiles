@@ -85,11 +85,9 @@ chmod 600 "$HOME/.ssh/config"
 
 # R configuration (R doesn't support XDG, needs symlinks)
 echo "Setting up R..."
-mkdir -p "$HOME/.R"
 setup link "$CONFIG_DIR/r/Rprofile" "$HOME/.Rprofile"
 setup link "$CONFIG_DIR/r/Renviron" "$HOME/.Renviron"
 setup link "$CONFIG_DIR/r/lintr" "$HOME/.lintr"
-setup link "$CONFIG_DIR/r/Makevars" "$HOME/.R/Makevars"
 # Note: radian uses XDG natively ($XDG_CONFIG_HOME/radian/profile)
 
 # AI agent configuration

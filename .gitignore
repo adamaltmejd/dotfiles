@@ -21,9 +21,11 @@
 !ssh/
 !ssh/**
 
-# R configuration
+# R configuration (explicit files only; XDG-aware packages write here too)
 !r/
-!r/**
+!r/Rprofile
+!r/Renviron
+!r/lintr
 
 # Radian (R console)
 !radian/

@@ -7,7 +7,7 @@ XDG-compliant macOS dotfiles. This repo is cloned directly to `~/.config`.
 - `zsh/` - ZDOTDIR, all zsh configuration
 - `zsh/conf.d/` - Topic-based shell configs (core.zsh, git.zsh, macos.zsh, node.zsh, python.zsh, r.zsh)
 - `git/` - Git config (XDG native location)
-- `r/` - R configs (Rprofile, Renviron, Makevars, lintr; symlinked to ~/)
+- `r/` - R configs (Rprofile, Renviron, lintr; symlinked to ~/)
 - `radian/` - Radian R console config
 - `ssh/` - SSH config (included by ~/.ssh/config), with config.d/ for host-specific configs
 - `ansible/` - Ansible config (vault password file)
