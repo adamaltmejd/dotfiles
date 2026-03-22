@@ -1,3 +1,12 @@
+# PVE nodes (password auth for initial setup)
+Host 10.?.50.2
+    User root
+    Port 22
+    PasswordAuthentication yes
+    StrictHostKeyChecking accept-new
+    UserKnownHostsFile ~/.ssh/known_hosts_homelab
+    LogLevel ERROR
+
 # Breven Homelab services (VLAN40, 50)
 Host 10.?.40.* 10.?.50.* !10.?.50.2
     Port 22

@@ -208,12 +208,6 @@ fman() {
     [[ -n "$page" ]] && man "$page"
 }
 
-# Reset mouse tracking after SSH (prevents garbage on click after ungraceful disconnect)
-ssh() {
-    command ssh "$@"
-    printf '\e[?1000l\e[?1002l\e[?1003l\e[?1006l'
-}
-
 # Erase current session history
 erase_history() {
     builtin history -c
