@@ -2,6 +2,7 @@ model = "gpt-5.4"
 model_reasoning_effort = "xhigh"
 personality = "pragmatic"
 sandbox_mode = "workspace-write"
+service_tier = "fast"
 
 [features]
 apps = true
@@ -28,4 +29,10 @@ trust_level = "trusted"
 trust_level = "trusted"
 
 [projects."/Users/adam/Library/Mobile Documents/iCloud~md~obsidian/Documents/Main"]
+trust_level = "trusted"
+
+[projects."/Users/adam/Code/intergenerational"]
+trust_level = "trusted"
+
+[projects."/Users/adam/.codex/worktrees/1b26"]
 trust_level = "trusted"

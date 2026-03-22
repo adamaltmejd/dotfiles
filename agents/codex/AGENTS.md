@@ -1,5 +1,5 @@
-- Be skeptical and concise. Criticism is always welcome.
-- Always tell me:
+- Be skeptical and concise. Question my assumptions. Criticism is always welcome.
+- **Always tell me**:
   - when you think I'm wrong
   - when you see a better/smarter/more efficient approach
   - I seem unaware of a convention
@@ -8,10 +8,12 @@
 - **Coding style**: 
   - Prefer self-documenting code over comments. Never add comments that simply restate names.
   - Add comments when: (1) purpose of code block is unclear, (2) we deviate from conventions, (3) to inform about gotchas/footguns that can't be eliminated.
+  - Do not overengineer. Strive for clean, simple, and efficient code.
 - **Tools**
-  - lint with `ruff check` (python) and `lintr` (R)
+  - lint with `ruff check` (python)
   - format with `ruff format`(python) and `air` (R)
   - `uv` for python
+  - `bun` not node/npm
   - `rg` not grep
   - `fd` not find
   - `tree`

@@ -11,8 +11,10 @@ XDG-compliant macOS dotfiles. This repo is cloned directly to `~/.config`.
 - `radian/` - Radian R console config
 - `ssh/` - SSH config (included by ~/.ssh/config), with config.d/ for host-specific configs
 - `ansible/` - Ansible config (vault password file)
-- `claude/` - Claude Code settings (symlinked to ~/.claude/)
-- `codex/` - OpenAI Codex CLI config and rules (symlinked to ~/.codex/)
+- `agents/` - AI agent configs (Claude Code, Codex CLI, shared skills)
+- `agents/claude/` - Claude Code settings (symlinked to ~/.claude/)
+- `agents/codex/` - Codex CLI config and rules (symlinked to ~/.codex/)
+- `agents/skills/` - Shared skills (symlinked to ~/.claude/skills and ~/.agents/skills)
 - `system/` - Brewfile, setup.sh
 
 ## Key Files
@@ -26,9 +28,9 @@ XDG-compliant macOS dotfiles. This repo is cloned directly to `~/.config`.
 | `zsh/secrets.zsh` | 1Password secrets loader |
 | `zsh/conf.d/*.zsh` | Topic-specific shell configuration |
 | `git/config` | Git configuration |
-| `claude/settings.json` | Claude Code plugins and settings |
-| `codex/config.toml` | Codex CLI model and feature settings |
-| `codex/rules/default.rules` | Codex command approval rules |
+| `agents/claude/settings.json` | Claude Code plugins and settings |
+| `agents/codex/config.toml` | Codex CLI model and feature settings |
+| `agents/codex/rules/default.rules` | Codex command approval rules |
 
 ## Bootstrap
 

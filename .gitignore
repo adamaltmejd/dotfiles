@@ -37,13 +37,9 @@
 !ghostty/
 !ghostty/**
 
-# Claude Code
-!claude/
-!claude/**
-
-# Codex CLI
-!codex/
-!codex/**
+# AI agents (Claude Code, Codex CLI, shared skills)
+!agents/
+!agents/**
 
 # System files
 !system/

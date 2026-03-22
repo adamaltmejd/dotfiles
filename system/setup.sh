@@ -92,18 +92,16 @@ setup link "$CONFIG_DIR/r/lintr" "$HOME/.lintr"
 setup link "$CONFIG_DIR/r/Makevars" "$HOME/.R/Makevars"
 # Note: radian uses XDG natively ($XDG_CONFIG_HOME/radian/profile)
 
-# Claude Code configuration
-echo "Setting up Claude Code..."
-mkdir -p "$HOME/.claude"
-setup link "$CONFIG_DIR/claude/settings.json" "$HOME/.claude/settings.json"
-setup link "$CONFIG_DIR/claude/CLAUDE.md" "$HOME/.claude/CLAUDE.md"
-
-# Codex configuration
-echo "Setting up Codex..."
-mkdir -p "$HOME/.codex/rules"
-setup link "$CONFIG_DIR/codex/config.toml" "$HOME/.codex/config.toml"
-setup link "$CONFIG_DIR/codex/rules/default.rules" "$HOME/.codex/rules/default.rules"
-setup link "$CONFIG_DIR/codex/AGENTS.md" "$HOME/.codex/AGENTS.md"
+# AI agent configuration
+echo "Setting up AI agents..."
+mkdir -p "$HOME/.claude" "$HOME/.codex/rules" "$HOME/.agents"
+setup link "$CONFIG_DIR/agents/claude/settings.json" "$HOME/.claude/settings.json"
+setup link "$CONFIG_DIR/agents/claude/CLAUDE.md" "$HOME/.claude/CLAUDE.md"
+setup link "$CONFIG_DIR/agents/skills" "$HOME/.claude/skills"
+setup link "$CONFIG_DIR/agents/skills" "$HOME/.agents/skills"
+setup link "$CONFIG_DIR/agents/codex/config.toml" "$HOME/.codex/config.toml"
+setup link "$CONFIG_DIR/agents/codex/rules/default.rules" "$HOME/.codex/rules/default.rules"
+setup link "$CONFIG_DIR/agents/codex/AGENTS.md" "$HOME/.codex/AGENTS.md"
 
 # Suppress login message
 touch "$HOME/.hushlogin"
