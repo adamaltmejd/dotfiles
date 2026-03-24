@@ -155,18 +155,22 @@ write_file_from_string "$HOME/.ssh/config" "Include $DOTFILES_DIR/ssh/config" "$
 set_mode "$HOME/.ssh/config" 600
 run_or_print touch "$HOME/.hushlogin"
 
-# Python shims: force uv workflows
-_python_shim='#!/usr/bin/env sh
+# Python shims: force uv workflows (local profile only)
+if [[ "$PROFILE" == "local" ]]; then
+    _python_shim='#!/usr/bin/env sh
 echo "Blocked: use '\''uv run python ...'\'' (or python3)." >&2
 exit 1'
-_pip_shim='#!/usr/bin/env sh
+    _pip_shim='#!/usr/bin/env sh
 exec uv pip "$@"'
-write_file_from_string "$HOME/.local/bin/python" "$_python_shim" "$BACKUP_DIR"
-set_mode "$HOME/.local/bin/python" 755
-write_file_from_string "$HOME/.local/bin/pip" "$_pip_shim" "$BACKUP_DIR"
-set_mode "$HOME/.local/bin/pip" 755
-run_or_print ln -sf "$HOME/.local/bin/pip" "$HOME/.local/bin/pip3"
-unset _python_shim _pip_shim
+    write_file_from_string "$HOME/.local/bin/python" "$_python_shim" "$BACKUP_DIR"
+    set_mode "$HOME/.local/bin/python" 755
+    write_file_from_string "$HOME/.local/bin/pip" "$_pip_shim" "$BACKUP_DIR"
+    set_mode "$HOME/.local/bin/pip" 755
+    run_or_print ln -sf "$HOME/.local/bin/pip" "$HOME/.local/bin/pip3"
+    unset _python_shim _pip_shim
+else
+    log_info "Skipping python/pip shims (server profile)."
+fi
 
 ensure_dir "$XDG_CONFIG_HOME_VALUE/dotfiles"
 write_file_from_string "$XDG_CONFIG_HOME_VALUE/dotfiles/profile" "$PROFILE_CONTENT" "$BACKUP_DIR"

@@ -19,9 +19,12 @@ read_package_file() {
 _pkg_run() {
     local sudo_mode="$1"; shift
     case "$sudo_mode" in
-        disabled|unavailable)
-            log_warn "Skipping (requires root/sudo): $*"
+        disabled)
+            log_warn "Skipping (sudo disabled via --no-sudo): $*"
             return 0
+            ;;
+        unavailable)
+            die "Cannot install packages: sudo not available and not running as root. Run as root or install sudo."
             ;;
         root)
             run_or_print "$@"
