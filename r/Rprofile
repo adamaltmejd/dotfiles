@@ -1,5 +1,5 @@
 # See help(startup) for documentation
-options(repos = c(CRAN = "https://packagemanager.posit.co/cran/latest"))
+options(repos = c(CRAN = "https://cloud.r-project.org"))
 
 options(stringsAsFactors = FALSE)
 options(menu.graphics = FALSE) # Don't load TK
