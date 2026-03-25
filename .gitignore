@@ -5,7 +5,8 @@
 !.gitignore
 !README.md
 !CLAUDE.md
-!PLAN.md
+!bootstrap.sh
+!setup.sh
 
 # Zsh configuration
 !zsh/
@@ -43,9 +44,15 @@
 !agents/
 !agents/**
 
-# System files
-!system/
-!system/**
+# macOS helper files
+!macos/
+!macos/**
+
+# Setup internals and docs
+!setup/
+!setup/**
+!docs/
+!docs/**
 
 # Ignore generated/local files within tracked dirs
 zsh/plugins.zsh

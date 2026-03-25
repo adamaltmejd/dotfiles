@@ -1,0 +1,7 @@
+# Shared packages used on both local and server profiles.
+# Keep package names as generic as possible.
+
+zsh
+git
+tmux
+ripgrep

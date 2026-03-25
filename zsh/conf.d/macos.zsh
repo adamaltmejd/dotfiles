@@ -1,5 +1,6 @@
 #!/usr/bin/env zsh
 # macOS-specific configuration
+[[ "$OSTYPE" == darwin* ]] || return 0
 
 #
 # Network

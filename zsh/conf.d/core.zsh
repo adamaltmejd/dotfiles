@@ -136,7 +136,7 @@ bindkey '^[[B' history-beginning-search-forward   # Down
 #
 
 # Modern ls (eza)
-if (( $+commands[eza] )); then
+if feat smartcli && (( $+commands[eza] )); then
     alias ls="eza"
     alias l="eza -l"
     alias la="eza -la"
@@ -146,7 +146,7 @@ if (( $+commands[eza] )); then
 fi
 
 # Modern cat (bat)
-if (( $+commands[bat] )); then
+if feat smartcli && (( $+commands[bat] )); then
     alias cat="bat --paging=never"
 
     # Use bat as man pager

@@ -1,83 +1,76 @@
 # Dotfiles
 
-XDG-compliant dotfiles for macOS. This repository is designed to be cloned directly to `~/.config`.
+XDG-compliant dotfiles for macOS and Linux, with profile-aware setup.
 
-## Quick Start
+## Install
 
-```zsh
-# 1. Install Xcode CLI tools
-xcode-select --install
+One-liner for a fresh machine (requires `curl` and `bash`):
 
-# 2. Clone directly to ~/.config
+```bash
+curl -fsSL https://raw.githubusercontent.com/adamaltmejd/dotfiles/main/bootstrap.sh | bash
+```
+
+This auto-detects your OS (macOS → `local`, Linux → `server`), installs git if needed, clones the repo to `~/.config`, and runs setup.
+
+### Options
+
+```bash
+# Explicit profile
+curl -fsSL .../bootstrap.sh | bash -s -- --profile server
+
+# Preview without applying
+curl -fsSL .../bootstrap.sh | bash -s -- --dry-run
+
+# Enable specific features on server
+curl -fsSL .../bootstrap.sh | bash -s -- --with-claude --with-starship
+```
+
+### Manual setup
+
+```bash
 git clone https://github.com/adamaltmejd/dotfiles.git ~/.config
-
-# 3. Run setup
-~/.config/system/setup.sh
-
-# 4. Restart shell
+cd ~/.config
+./setup.sh --profile local --dry-run   # preview
+./setup.sh --profile local             # run (prompts for confirmation)
 exec zsh
 ```
 
-## Structure
+On macOS, install Xcode CLI tools first: `xcode-select --install`
 
-```
-~/.config/                      # This repo
-├── zsh/                        # ZDOTDIR - all zsh config
-│   ├── .zshrc
-│   ├── .zshenv
-│   ├── .p10k.zsh
-│   ├── plugins.txt             # Antidote plugins
-│   ├── secrets.zsh             # 1Password secrets loader
-│   └── conf.d/                 # Topic-based configs
-│       ├── core.zsh
-│       ├── git.zsh
-│       ├── macos.zsh
-│       ├── node.zsh
-│       ├── python.zsh
-│       └── r.zsh
-├── git/                        # Git config (XDG native)
-│   ├── config
-│   └── ignore
-├── r/                          # R configs (symlinked to ~/)
-│   ├── Rprofile
-│   ├── Renviron
-│   ├── Makevars
-│   └── lintr
-├── radian/                     # Radian R console config
-│   └── profile
-├── ssh/                        # SSH config (included by ~/.ssh/config)
-│   ├── config
-│   └── config.d/
-├── ansible/                    # Ansible config
-│   └── vault-password-file
-└── system/                     # Setup scripts, Brewfile
-    ├── setup.sh
-    └── Brewfile
-```
+## What it does
 
-## XDG Base Directory
+Setup writes a minimal `~/.zshenv` that sets XDG variables and points `ZDOTDIR` at the repo's `zsh/` directory. Everything else is either symlinked or installed from there.
 
-This setup uses the XDG Base Directory Specification:
+### Profiles
 
-| Variable | Location | Purpose |
-|----------|----------|---------|
-| `XDG_CONFIG_HOME` | `~/.config` | User config files (this repo) |
-| `XDG_DATA_HOME` | `~/.local/share` | User data files |
-| `XDG_STATE_HOME` | `~/.local/state` | User state (logs, history) |
-| `XDG_CACHE_HOME` | `~/.cache` | Non-essential cached data |
+| | `local` (macOS default) | `server` (Linux default) |
+|---|---|---|
+| Shell + git config | yes | yes |
+| Packages | full Brewfile + shared | shared + htop |
+| [Modern CLI tools](#modern-cli-tools) | yes (starship, eza, bat, fd, fzf, zoxide) | no |
+| direnv | yes | no |
+| R dotfiles | yes | no |
+| Claude/Codex config | yes | no |
+| Python/pip shims (enforce uv) | yes | no |
 
-## Files Outside ~/.config
+Override any feature with `--with-<feature>` or `--without-<feature>`.
 
-Some tools don't support XDG. These are handled by `setup.sh`:
+### What setup touches
 
-| File | Purpose | How |
-|------|---------|-----|
-| `~/.zshenv` | Bootstrap ZDOTDIR | Written by setup.sh |
-| `~/.ssh/config` | SSH configuration | Includes `~/.config/ssh/config` |
-| `~/.Rprofile` | R startup | Symlink to `r/Rprofile` |
-| `~/.Renviron` | R environment | Symlink to `r/Renviron` |
+| Target | Action |
+|--------|--------|
+| `~/.zshenv` | Written (XDG vars + ZDOTDIR) |
+| `~/.ssh/config` | Written (Include directive) |
+| `~/.local/bin/python`, `pip` | Shims enforcing `uv` (local only) |
+| `~/.config/dotfiles/profile` | Feature flags for shell to read |
+| `~/.Rprofile`, `~/.Renviron`, etc. | Symlinked (if R enabled) |
+| `~/.claude/`, `~/.codex/`, `~/.agents/` | Symlinked from `agents/` (if claude enabled) |
 
-## Modern CLI Tools
+Existing files are backed up to `~/dotfiles-backup/<timestamp>/` before replacement.
+
+## Modern CLI tools
+
+Installed on `local` profile (or with `--with-smartcli`):
 
 | Tool | Replaces | Usage |
 |------|----------|-------|
@@ -86,21 +79,37 @@ Some tools don't support XDG. These are handled by `setup.sh`:
 | `ripgrep` | `grep` | `rg` |
 | `fd` | `find` | `fd` |
 | `zoxide` | `cd` | `z <partial>` |
-| `fzf` | - | Ctrl+R history, Ctrl+T files |
-| `tlrc` | `man`/`tldr` | Modern tldr client |
+| `fzf` | — | Ctrl+R history, Ctrl+T files |
+| `starship` | prompt | Cross-shell prompt |
 | `delta` | git diff | Automatic via gitconfig |
-
-## Package Managers
-
-| Language | Tool | Notes |
-|----------|------|-------|
-| Python | `uv` | Fast pip/venv replacement |
-| JavaScript | `bun` | Fast npm/node replacement |
-| R | `renv` + `pak` | Per-project isolation |
 
 ## Secrets
 
-Secrets are managed via 1Password CLI (`op`). No secrets are stored in this repository. Secrets are loaded via `zsh/secrets.zsh`.
+Managed via 1Password CLI (`op`). No secrets are stored in this repository. Loaded at shell startup via `zsh/secrets.zsh`.
+
+## Repository layout
+
+```
+dotfiles/
+├── bootstrap.sh            # curl-to-bash entry point
+├── setup.sh                # main setup script
+├── setup/
+│   ├── lib/                # detection, linking, package helpers
+│   └── packages/           # package manifests (shared, local, server)
+├── zsh/                    # ZDOTDIR — .zshrc, .zshenv, conf.d/
+├── git/                    # git config
+├── ssh/                    # ssh config + config.d/ for hosts
+├── macos/                  # Brewfile, apply-defaults.zsh
+├── r/                      # Rprofile, Renviron, lintr
+├── radian/                 # radian console config
+├── agents/                 # AI agent configs + shared skills
+│   ├── claude/             # Claude Code settings
+│   ├── codex/              # Codex CLI config + rules
+│   └── skills/             # shared skills (symlinked to ~/.claude/skills)
+├── ansible/                # ansible config
+├── gh/                     # GitHub CLI config
+└── ghostty/                # ghostty terminal config
+```
 
 ## License
 

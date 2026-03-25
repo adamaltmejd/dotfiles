@@ -90,3 +90,6 @@
 
 [init]
 	defaultBranch = main
+
+[include]
+	path = config.local

@@ -1,6 +1,6 @@
 #!/usr/bin/env zsh
 # macOS system defaults
-# Run via setup.sh or manually: ./defaults.sh
+# Run manually from repo root: ./macos/apply-defaults.zsh
 # Some settings require logout/restart to take effect
 
 set -e
