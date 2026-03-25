@@ -1,31 +1,31 @@
 # Dotfiles
 
-XDG-compliant dotfiles for macOS and Linux, with profile-aware bootstrap.
+XDG-compliant dotfiles for macOS and Linux, with profile-aware setup.
 
 ## Install
 
 One-liner for a fresh machine (requires `curl` and `bash`):
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/adamaltmejd/dotfiles/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/adamaltmejd/dotfiles/main/bootstrap.sh | bash
 ```
 
-This auto-detects your OS (macOS → `local`, Linux → `server`), installs git if needed, clones the repo to `~/.config/dotfiles`, and runs bootstrap with `--apply`.
+This auto-detects your OS (macOS → `local`, Linux → `server`), installs git if needed, clones the repo to `~/.config/dotfiles`, and runs setup.
 
 ### Options
 
 ```bash
 # Explicit profile
-curl -fsSL .../install.sh | bash -s -- --profile server
+curl -fsSL .../bootstrap.sh | bash -s -- --profile server
 
 # Preview without applying
-curl -fsSL .../install.sh | bash -s -- --dry-run
+curl -fsSL .../bootstrap.sh | bash -s -- --dry-run
 
 # Enable specific features on server
-curl -fsSL .../install.sh | bash -s -- --with-claude --with-starship
+curl -fsSL .../bootstrap.sh | bash -s -- --with-claude --with-starship
 
 # Custom clone location
-curl -fsSL .../install.sh | bash -s -- --dotfiles-dir ~/dotfiles
+curl -fsSL .../bootstrap.sh | bash -s -- --dotfiles-dir ~/dotfiles
 ```
 
 ### Manual setup
@@ -33,8 +33,8 @@ curl -fsSL .../install.sh | bash -s -- --dotfiles-dir ~/dotfiles
 ```bash
 git clone https://github.com/adamaltmejd/dotfiles.git ~/.config/dotfiles
 cd ~/.config/dotfiles
-./bootstrap.sh --profile local --dry-run   # preview
-./bootstrap.sh --profile local --apply     # run
+./setup.sh --profile local --dry-run   # preview
+./setup.sh --profile local             # run (prompts for confirmation)
 exec zsh
 ```
 
@@ -42,7 +42,7 @@ On macOS, install Xcode CLI tools first: `xcode-select --install`
 
 ## What it does
 
-Bootstrap writes a minimal `~/.zshenv` that sets XDG variables and points `ZDOTDIR` at the repo's `zsh/` directory. Everything else is either symlinked or installed from there.
+Setup writes a minimal `~/.zshenv` that sets XDG variables and points `ZDOTDIR` at the repo's `zsh/` directory. Everything else is either symlinked or installed from there.
 
 ### Profiles
 
@@ -58,7 +58,7 @@ Bootstrap writes a minimal `~/.zshenv` that sets XDG variables and points `ZDOTD
 
 Override any feature with `--with-<feature>` or `--without-<feature>`.
 
-### What bootstrap touches
+### What setup touches
 
 | Target | Action |
 |--------|--------|
@@ -67,7 +67,7 @@ Override any feature with `--with-<feature>` or `--without-<feature>`.
 | `~/.local/bin/python`, `pip` | Shims enforcing `uv` (local only) |
 | `~/.config/dotfiles/profile` | Feature flags for shell to read |
 | `~/.Rprofile`, `~/.Renviron`, etc. | Symlinked (if R enabled) |
-| `~/.claude/`, `~/.codex/` | Symlinked (if claude enabled) |
+| `~/.claude/`, `~/.codex/`, `~/.agents/` | Symlinked from `agents/` (if claude enabled) |
 
 Existing files are backed up to `~/dotfiles-backup/<timestamp>/` before replacement.
 
@@ -94,19 +94,21 @@ Managed via 1Password CLI (`op`). No secrets are stored in this repository. Load
 
 ```
 dotfiles/
-├── install.sh              # curl-to-bash installer
-├── bootstrap.sh            # main setup entrypoint
-├── bootstrap/
+├── bootstrap.sh            # curl-to-bash entry point
+├── setup.sh                # main setup script
+├── setup/
 │   ├── lib/                # detection, linking, package helpers
 │   └── packages/           # package manifests (shared, local, server)
 ├── zsh/                    # ZDOTDIR — .zshrc, .zshenv, conf.d/
 ├── git/                    # git config
 ├── ssh/                    # ssh config + config.d/ for hosts
 ├── macos/                  # Brewfile, apply-defaults.zsh
-├── r/                      # Rprofile, Renviron, Makevars, lintr
+├── r/                      # Rprofile, Renviron, lintr
 ├── radian/                 # radian console config
-├── claude/                 # Claude Code settings
-├── codex/                  # Codex CLI config + rules
+├── agents/                 # AI agent configs + shared skills
+│   ├── claude/             # Claude Code settings
+│   ├── codex/              # Codex CLI config + rules
+│   └── skills/             # shared skills (symlinked to ~/.claude/skills)
 ├── ansible/                # ansible config
 ├── gh/                     # GitHub CLI config
 └── ghostty/                # ghostty terminal config

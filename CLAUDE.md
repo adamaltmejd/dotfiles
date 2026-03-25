@@ -5,7 +5,7 @@ XDG-compliant macOS dotfiles. Default location is `~/.config` (`XDG_CONFIG_HOME`
 ## Structure
 
 - `zsh/` - ZDOTDIR, all zsh configuration
-- `zsh/conf.d/` - Topic-based shell configs (core.zsh, git.zsh, macos.zsh, node.zsh, python.zsh, r.zsh)
+- `zsh/conf.d/` - Topic-based shell configs (core.zsh, git.zsh, macos.zsh, node.zsh, python.zsh, r.zsh, ssh.zsh)
 - `git/` - Git config (XDG native location)
 - `r/` - R configs (Rprofile, Renviron, lintr; symlinked to ~/)
 - `radian/` - Radian R console config
@@ -16,23 +16,25 @@ XDG-compliant macOS dotfiles. Default location is `~/.config` (`XDG_CONFIG_HOME`
 - `agents/codex/` - Codex CLI config and rules (symlinked to ~/.codex/)
 - `agents/skills/` - Shared skills (symlinked to ~/.claude/skills and ~/.agents/skills)
 - `macos/` - packages.Brewfile, apply-defaults.zsh
-- `bootstrap.sh` - profile-aware integration bootstrap entrypoint
-- `bootstrap/lib/` - bootstrap helper modules (detect/link/packages/common)
-- `bootstrap/packages/` - profile-scoped package manifests
+- `bootstrap.sh` - curl-to-bash entry point (clones repo, runs setup)
+- `setup.sh` - profile-aware setup script
+- `setup/lib/` - setup helper modules (detect/link/packages/common)
+- `setup/packages/` - profile-scoped package manifests
 - `docs/` - migration notes for local/server profiles
 
 ## Key Files
 
 | File | Purpose |
 |------|---------|
-| `bootstrap.sh` | Main setup script for new machines |
+| `bootstrap.sh` | Curl-to-bash entry point for fresh machines |
+| `setup.sh` | Main setup script (profiles, features, packages) |
 | `macos/packages.Brewfile` | Homebrew packages and casks |
 | `macos/apply-defaults.zsh` | Apply macOS defaults |
-| `bootstrap/packages/packages.shared.txt` | Shared package manifest |
-| `bootstrap/packages/packages.local.txt` | Local profile package manifest |
-| `bootstrap/packages/packages.server.txt` | Server profile package manifest |
+| `setup/packages/packages.shared.txt` | Shared package manifest |
+| `setup/packages/packages.local.txt` | Local profile package manifest |
+| `setup/packages/packages.server.txt` | Server profile package manifest |
 | `zsh/.zshrc` | Interactive shell config |
-| `zsh/.zshenv` | Environment variables (sourced by bootstrap) |
+| `zsh/.zshenv` | Environment variables (sourced by setup) |
 | `zsh/secrets.zsh` | 1Password secrets loader |
 | `zsh/conf.d/*.zsh` | Topic-specific shell configuration |
 | `git/config` | Git configuration |
@@ -40,9 +42,9 @@ XDG-compliant macOS dotfiles. Default location is `~/.config` (`XDG_CONFIG_HOME`
 | `agents/codex/config.toml` | Codex CLI model and feature settings |
 | `agents/codex/rules/default.rules` | Codex command approval rules |
 
-## Bootstrap
+## Setup
 
-A minimal `~/.zshenv` (written by bootstrap.sh) sets XDG vars and ZDOTDIR, then sources `"$DOTFILES_DIR/zsh/.zshenv"`.
+A minimal `~/.zshenv` (written by setup.sh) sets XDG vars and ZDOTDIR, then sources `"$DOTFILES_DIR/zsh/.zshenv"`.
 `zsh/.zshrc` then loads `"$XDG_CONFIG_HOME/dotfiles/host.local"` last when present, so host-level overrides win.
 
 ## Editing Guidelines
@@ -52,7 +54,7 @@ A minimal `~/.zshenv` (written by bootstrap.sh) sets XDG vars and ZDOTDIR, then 
 - **Environment variables**: `zsh/.zshenv` for universal, `zsh/conf.d/*.zsh` for topic-specific
 - **Git config**: `git/config` (or `git/config.local` for machine-specific, gitignored)
 - **SSH hosts**: Add to `ssh/config.d/` for host-specific configs
-- **New tool config**: Create new directory if XDG-compliant, otherwise add symlink in `bootstrap.sh`
+- **New tool config**: Create new directory if XDG-compliant, otherwise add symlink in `setup.sh`
 - **Secrets**: Use 1Password CLI via `zsh/secrets.zsh`, never commit secrets
 
 ## Coding Guidelines

@@ -65,7 +65,7 @@ bootstrap_zshenv_content() {
     local profile="${3:-}"
     cat <<EOF_INNER
 #!/usr/bin/env zsh
-# Managed by dotfiles bootstrap.sh
+# Managed by dotfiles setup.sh
 export XDG_CONFIG_HOME="\${XDG_CONFIG_HOME:-$xdg_config_home}"
 export XDG_DATA_HOME="\${XDG_DATA_HOME:-\$HOME/.local/share}"
 export XDG_STATE_HOME="\${XDG_STATE_HOME:-\$HOME/.local/state}"
@@ -129,7 +129,7 @@ build_profile_content() {
     done
 
     cat <<EOF
-# Managed by dotfiles bootstrap.sh — do not edit
+# Managed by dotfiles setup.sh — do not edit
 DOTFILES_PROFILE=$profile
 DOTFILES_FEAT_STARSHIP=$feat_starship
 DOTFILES_FEAT_DIRENV=$feat_direnv

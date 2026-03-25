@@ -1,6 +1,6 @@
-# Bootstrap Internals
+# Setup Internals
 
-This directory contains implementation details for `../bootstrap.sh`.
+This directory contains implementation details for `../setup.sh`.
 
 ## Layout
 

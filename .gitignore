@@ -7,7 +7,7 @@
 !CLAUDE.md
 !PLAN.md
 !bootstrap.sh
-!install.sh
+!setup.sh
 
 # Zsh configuration
 !zsh/
@@ -49,9 +49,9 @@
 !macos/
 !macos/**
 
-# Bootstrap internals and docs
-!bootstrap/
-!bootstrap/**
+# Setup internals and docs
+!setup/
+!setup/**
 !docs/
 !docs/**
 !legacy/
