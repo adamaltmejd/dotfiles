@@ -160,7 +160,9 @@ ensure_dir "$HOME/.local/share"
 ensure_dir "$HOME/.local/state/zsh"
 ensure_dir "$HOME/.cache"
 ensure_dir "$HOME/.ssh"
+set_mode "$HOME/.ssh" 700
 ensure_dir "$HOME/.ssh/sockets"
+set_mode "$HOME/.ssh/sockets" 700
 
 phase "Link / write managed files"
 write_file_from_string "$HOME/.zshenv" "$(bootstrap_zshenv_content "$DOTFILES_DIR" "$XDG_CONFIG_HOME_VALUE" "$PROFILE")" "$BACKUP_DIR"
