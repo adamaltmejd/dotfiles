@@ -13,11 +13,11 @@ fi
 #
 # Apple system paths
 if [[ -x /usr/libexec/path_helper ]]; then
-  eval $(/usr/libexec/path_helper -s)
+  eval "$(/usr/libexec/path_helper -s)"
 fi
 # Homebrew
 if [[ -x /opt/homebrew/bin/brew ]]; then
-  eval $(/opt/homebrew/bin/brew shellenv)
+  eval "$(/opt/homebrew/bin/brew shellenv)"
 fi
 
 # Additional paths
