@@ -87,7 +87,7 @@ if [[ -z "$PROFILE" ]]; then
 fi
 
 # Build final args: --yes skips confirmation (stdin isn't a tty in a pipe)
-SETUP_ARGS=("--profile" "$PROFILE" "--yes" "${PASSTHROUGH_ARGS[@]}")
+SETUP_ARGS=("--profile" "$PROFILE" "--yes" "${PASSTHROUGH_ARGS[@]+"${PASSTHROUGH_ARGS[@]}"}")
 
 # --- Clone or update repo ---
 
