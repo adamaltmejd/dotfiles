@@ -135,8 +135,8 @@ install_packages() {
 }
 
 # Install packages gated by feature flags.
-# Usage: install_feature_packages <manager> <sudo_mode>
-# Reads DOTFILES_FEAT_* from the environment.
+# Globs setup/packages/packages.feat-*.txt, extracts the feature name
+# from the filename, checks DOTFILES_FEAT_<NAME>, and installs if enabled.
 install_feature_packages() {
     local manager="$1"
     local sudo_mode="$2"
@@ -145,19 +145,20 @@ install_feature_packages() {
         return 0
     fi
 
-    local feat_pkg
-    for feat_pkg in \
-        "DOTFILES_FEAT_STARSHIP:starship" \
-        "DOTFILES_FEAT_DIRENV:direnv" \
-        "DOTFILES_FEAT_SMARTCLI:eza" \
-        "DOTFILES_FEAT_SMARTCLI:bat" \
-        "DOTFILES_FEAT_SMARTCLI:fd" \
-        "DOTFILES_FEAT_SMARTCLI:fzf" \
-        "DOTFILES_FEAT_SMARTCLI:zoxide"; do
-        local var="${feat_pkg%%:*}"
-        local pkg="${feat_pkg#*:}"
+    local feat_file
+    for feat_file in "$DOTFILES_DIR"/setup/packages/packages.feat-*.txt; do
+        [[ -f "$feat_file" ]] || continue
+        local basename="${feat_file##*/}"
+        local feat_name="${basename#packages.feat-}"
+        feat_name="${feat_name%.txt}"
+        feat_name="${feat_name^^}"
+        local var="DOTFILES_FEAT_${feat_name}"
+
         if [[ "${!var:-0}" -eq 1 ]]; then
-            install_one_package "$pkg" "$manager" "$sudo_mode"
+            local pkg
+            while IFS= read -r pkg; do
+                install_one_package "$pkg" "$manager" "$sudo_mode"
+            done < <(read_package_file "$feat_file")
         fi
     done
 }
