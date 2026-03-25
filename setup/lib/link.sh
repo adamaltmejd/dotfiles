@@ -1,5 +1,20 @@
 #!/usr/bin/env bash
 
+# Resolve a path to its canonical absolute form.
+resolve_path() {
+    if command -v realpath >/dev/null 2>&1; then
+        realpath "$1" 2>/dev/null && return
+    fi
+    # Fallback: cd/pwd -P (works on macOS without coreutils)
+    if [[ -d "$1" ]]; then
+        (cd "$1" && pwd -P)
+    elif [[ -e "$1" || -L "$1" ]]; then
+        (cd "$(dirname "$1")" && echo "$(pwd -P)/$(basename "$1")")
+    else
+        echo "$1"
+    fi
+}
+
 is_same_content() {
     local target="$1"
     local expected="$2"
@@ -63,8 +78,8 @@ link_file() {
 
     if [[ -L "$target" ]]; then
         local current_target
-        current_target="$(readlink "$target")"
-        if [[ "$current_target" == "$source" ]]; then
+        current_target="$(resolve_path "$target")"
+        if [[ "$current_target" == "$(resolve_path "$source")" ]]; then
             log_info "Already linked $target -> $source"
             return 0
         fi
