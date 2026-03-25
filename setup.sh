@@ -112,6 +112,9 @@ fi
 if [[ -z "$XDG_CONFIG_HOME_VALUE" ]]; then
     die "Invalid --xdg-config-home value (must be a non-empty path)"
 fi
+if [[ "$XDG_CONFIG_HOME_VALUE" != /* ]]; then
+    die "--xdg-config-home must be an absolute path (got '$XDG_CONFIG_HOME_VALUE')"
+fi
 
 if [[ -z "$BACKUP_DIR" ]]; then
     BACKUP_DIR="$HOME/dotfiles-backup/$(timestamp)"
