@@ -5,6 +5,3 @@ Host *
     AddKeysToAgent yes
     UseKeychain yes
     IdentitiesOnly yes
-
-# Host-specific configurations
-Include ~/.config/ssh/config.d/*

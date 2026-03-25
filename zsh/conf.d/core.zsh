@@ -189,7 +189,7 @@ fs() {
     else
         local arg=-sh
     fi
-    if [[ -n "$@" ]]; then
+    if (( $# )); then
         du $arg -- "$@"
     else
         du $arg .[^.]* ./*

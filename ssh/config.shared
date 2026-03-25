@@ -6,3 +6,6 @@ Host *
     ControlPath ~/.ssh/sockets/%C
     ControlPersist 1800
     ServerAliveInterval 60
+
+# Host-specific configurations
+Include ~/.config/ssh/config.d/*

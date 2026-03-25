@@ -11,9 +11,7 @@ brew "libomp"
 brew "libfido2"
 
 # Shell and CLI
-brew "zsh"
 brew "antidote"
-brew "ripgrep"
 brew "tlrc"
 brew "delta"
 brew "terminal-notifier"
@@ -21,7 +19,6 @@ brew "pinentry-mac"
 brew "mole"
 
 # Version control
-brew "git"
 brew "git-lfs"
 brew "git-filter-repo"
 brew "gh"
