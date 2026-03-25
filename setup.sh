@@ -244,7 +244,7 @@ else
         local_brewfile="$DOTFILES_DIR/macos/packages.Brewfile"
         if [[ -f "$local_brewfile" ]]; then
             log_info "Installing macOS packages from Brewfile..."
-            run_or_print brew bundle --file="$local_brewfile" --no-lock
+            run_or_print brew bundle --file="$local_brewfile"
         fi
         unset local_brewfile
     fi
