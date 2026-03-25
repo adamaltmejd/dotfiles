@@ -72,7 +72,7 @@ export XDG_STATE_HOME="\${XDG_STATE_HOME:-\$HOME/.local/state}"
 export XDG_CACHE_HOME="\${XDG_CACHE_HOME:-\$HOME/.cache}"
 
 export DOTFILES_DIR="\${DOTFILES_DIR:-$dotfiles_dir}"
-export DOTFILES_PROFILE="${profile}"
+export DOTFILES_PROFILE="\${DOTFILES_PROFILE:-${profile}}"
 export ZDOTDIR="\$DOTFILES_DIR/zsh"
 [[ -f "\$ZDOTDIR/.zshenv" ]] && source "\$ZDOTDIR/.zshenv"
 EOF_INNER
