@@ -4,7 +4,7 @@
 #
 # Profile feature flags (loaded early so conf.d files can use feat())
 #
-_profile="${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/profile"
+_profile="$DOTFILES_DIR/setup/profile"
 [[ -r "$_profile" ]] && source "$_profile"
 unset _profile
 
@@ -111,6 +111,6 @@ fi
 #
 # Host-local override (loaded last, wins on conflicts)
 #
-_host_local="${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/host.local"
+_host_local="${XDG_CONFIG_HOME:-$HOME/.config}/setup/host.local"
 [[ -r "$_host_local" ]] && source "$_host_local"
 unset _host_local

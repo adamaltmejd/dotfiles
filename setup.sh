@@ -207,8 +207,7 @@ else
     log_info "Skipping python/pip shims (server profile)."
 fi
 
-ensure_dir "$XDG_CONFIG_HOME_VALUE/dotfiles"
-write_file_from_string "$XDG_CONFIG_HOME_VALUE/dotfiles/profile" "$PROFILE_CONTENT" "$BACKUP_DIR"
+write_file_from_string "$DOTFILES_DIR/setup/profile" "$PROFILE_CONTENT" "$BACKUP_DIR"
 
 if [[ "$DOTFILES_FEAT_R" -eq 1 ]]; then
     link_file "$DOTFILES_DIR/r/Rprofile" "$HOME/.Rprofile" "$BACKUP_DIR"

@@ -62,7 +62,7 @@ Override any feature with `--with-<feature>` or `--without-<feature>`.
 | `~/.zshenv` | Written (XDG vars + ZDOTDIR) |
 | `~/.ssh/config` | Written (Include directive) |
 | `~/.local/bin/python`, `pip` | Shims enforcing `uv` (local only) |
-| `~/.config/dotfiles/profile` | Feature flags for shell to read |
+| `~/.config/setup/profile` | Feature flags for shell to read |
 | `~/.Rprofile`, `~/.Renviron`, etc. | Symlinked (if R enabled) |
 | `~/.claude/`, `~/.codex/`, `~/.agents/` | Symlinked from `agents/` (if claude enabled) |
 

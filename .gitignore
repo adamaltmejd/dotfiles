@@ -51,10 +51,8 @@
 # Setup internals and docs
 !setup/
 !setup/**
-!docs/
-!docs/**
-
 # Ignore generated/local files within tracked dirs
+setup/profile
 zsh/plugins.zsh
 zsh/.zcompdump*
 zsh/conf.d/local.zsh

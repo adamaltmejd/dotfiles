@@ -20,7 +20,7 @@ XDG-compliant macOS dotfiles. Default location is `~/.config` (`XDG_CONFIG_HOME`
 - `setup.sh` - profile-aware setup script
 - `setup/lib/` - setup helper modules (detect/link/packages/common)
 - `setup/packages/` - profile-scoped package manifests
-- `docs/` - migration notes for local/server profiles
+- `setup/profile` - generated feature flags (gitignored)
 
 ## Key Files
 
@@ -45,7 +45,7 @@ XDG-compliant macOS dotfiles. Default location is `~/.config` (`XDG_CONFIG_HOME`
 ## Setup
 
 A minimal `~/.zshenv` (written by setup.sh) sets XDG vars and ZDOTDIR, then sources `"$DOTFILES_DIR/zsh/.zshenv"`.
-`zsh/.zshrc` then loads `"$XDG_CONFIG_HOME/dotfiles/host.local"` last when present, so host-level overrides win.
+`zsh/.zshrc` then loads `"$XDG_CONFIG_HOME/setup/host.local"` last when present, so host-level overrides win.
 
 ## Editing Guidelines
 
