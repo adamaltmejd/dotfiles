@@ -267,6 +267,40 @@ if command -v git >/dev/null 2>&1 && git -C "$DOTFILES_DIR" rev-parse --is-insid
     unset _origin_url
 fi
 
+# 1Password SSH config injection (interactive only, macOS)
+if [[ "$OS_ID" == "darwin" && "$APPLY" -eq 1 ]]; then
+    _op_ref="op://Work/ir2amtuqlhxc6oyaxhgwiixum4/ssh config"
+    _op_target="$DOTFILES_DIR/ssh/config.d/SOFI.local"
+    if [[ -t 0 ]] && command -v op >/dev/null 2>&1; then
+        if ! op whoami >/dev/null 2>&1; then
+            log_info "1Password CLI not signed in. Attempting sign-in..."
+            set +e
+            eval "$(op signin)" 2>/dev/null
+            set -e
+        fi
+        if op whoami >/dev/null 2>&1; then
+            if [[ -f "$_op_target" ]]; then
+                log_info "1Password SSH config already present: $_op_target"
+            else
+                log_info "Injecting SSH config from 1Password..."
+                if op read "$_op_ref" --out-file "$_op_target"; then
+                    chmod 600 "$_op_target"
+                else
+                    log_warn "Failed to read SSH config from 1Password."
+                fi
+            fi
+        else
+            log_warn "1Password sign-in failed; skipping SSH config injection."
+        fi
+    else
+        if [[ ! -f "$_op_target" ]]; then
+            log_info "Skipping 1Password SSH config (non-interactive or op not found)."
+            log_info "  Run manually: op read \"$_op_ref\" --out-file \"$_op_target\" && chmod 600 \"$_op_target\""
+        fi
+    fi
+    unset _op_ref _op_target
+fi
+
 log_info "Verify: zsh -i -c 'exit'"
 log_info "Verify: git config --list | head"
 if [[ "$DOTFILES_FEAT_R" -eq 1 ]]; then
