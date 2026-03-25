@@ -217,4 +217,5 @@ erase_history() {
 zshaddhistory_erase_history() {
     [[ $1 != [[:space:]]#erase_history[[:space:]]# ]]
 }
-zshaddhistory_functions+=(zshaddhistory_erase_history)
+autoload -Uz add-zsh-hook
+add-zsh-hook zshaddhistory zshaddhistory_erase_history

@@ -9,7 +9,7 @@ XDG-compliant macOS dotfiles. Default location is `~/.config` (`XDG_CONFIG_HOME`
 - `git/` - Git config (XDG native location)
 - `r/` - R configs (Rprofile, Renviron, lintr; symlinked to ~/)
 - `radian/` - Radian R console config
-- `ssh/` - SSH config (included by ~/.ssh/config), with config.d/ for host-specific configs
+- `ssh/` - SSH config: config.shared (all profiles), config.macos (local only), config.d/ for host-specific configs
 - `ansible/` - Ansible config (vault password file)
 - `agents/` - AI agent configs (Claude Code, Codex CLI, shared skills)
 - `agents/claude/` - Claude Code settings (symlinked to ~/.claude/)

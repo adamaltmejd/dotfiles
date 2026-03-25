@@ -1,0 +1,10 @@
+# macOS SSH configuration (local profile only)
+# Included by ~/.ssh/config (managed by setup.sh)
+
+Host *
+    AddKeysToAgent yes
+    UseKeychain yes
+    IdentitiesOnly yes
+
+# Host-specific configurations
+Include ~/.config/ssh/config.d/*

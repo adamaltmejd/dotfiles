@@ -13,15 +13,7 @@ brew "libfido2"
 # Shell and CLI
 brew "zsh"
 brew "antidote"
-brew "starship"
-
-# Modern CLI tools
-brew "eza"
-brew "bat"
 brew "ripgrep"
-brew "fd"
-brew "zoxide"
-brew "fzf"
 brew "tlrc"
 brew "delta"
 brew "terminal-notifier"
@@ -38,7 +30,6 @@ brew "gh"
 brew "python3"
 brew "uv"
 brew "oven-sh/bun/bun"
-brew "direnv"
 
 # Documents
 brew "pandoc"

@@ -56,7 +56,6 @@ while [[ $# -gt 0 ]]; do
             shift
             ;;
         --apply)
-            # Kept for backwards compat; now the default
             MODE="apply"
             shift
             ;;
@@ -169,9 +168,27 @@ set_mode "$HOME/.ssh/sockets" 700
 
 phase "Link / write managed files"
 write_file_from_string "$HOME/.zshenv" "$(bootstrap_zshenv_content "$DOTFILES_DIR" "$XDG_CONFIG_HOME_VALUE" "$PROFILE")" "$BACKUP_DIR"
-write_file_from_string "$HOME/.ssh/config" "Include $DOTFILES_DIR/ssh/config" "$BACKUP_DIR"
+if [[ "$PROFILE" == "local" ]]; then
+    _ssh_includes="Include $DOTFILES_DIR/ssh/config.macos
+Include $DOTFILES_DIR/ssh/config.shared"
+else
+    _ssh_includes="Include $DOTFILES_DIR/ssh/config.shared"
+fi
+write_file_from_string "$HOME/.ssh/config" "$_ssh_includes" "$BACKUP_DIR"
+unset _ssh_includes
 set_mode "$HOME/.ssh/config" 600
 run_or_print touch "$HOME/.hushlogin"
+
+# macOS-specific git config (editor, credential helper)
+if [[ "$PROFILE" == "local" ]]; then
+    write_file_from_string "$DOTFILES_DIR/git/config.macos" \
+"# Managed by setup.sh — macOS-specific git settings
+[core]
+	editor = code --wait
+
+[credential]
+	helper = osxkeychain" "$BACKUP_DIR"
+fi
 
 # Python shims: force uv workflows (local profile only)
 if [[ "$PROFILE" == "local" ]]; then
@@ -237,9 +254,10 @@ else
         "$PKG_MANAGER" \
         "$SUDO_OK" \
         "$APPLY"
+
     install_feature_packages "$PKG_MANAGER" "$SUDO_OK"
 
-    # On macOS local, install from Brewfile
+    # On macOS local, install casks and build deps from Brewfile
     if [[ "$OS_ID" == "darwin" && "$PROFILE" == "local" && "$PKG_MANAGER" == "brew" ]]; then
         local_brewfile="$DOTFILES_DIR/macos/packages.Brewfile"
         if [[ -f "$local_brewfile" ]]; then

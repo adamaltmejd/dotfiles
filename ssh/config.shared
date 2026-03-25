@@ -1,0 +1,8 @@
+# Shared SSH configuration (all profiles)
+# Included by ~/.ssh/config (managed by setup.sh)
+
+Host *
+    ControlMaster auto
+    ControlPath ~/.ssh/sockets/%C
+    ControlPersist 1800
+    ServerAliveInterval 60

@@ -4,7 +4,6 @@
 	signingkey = ~/.ssh/id_github
 
 [core]
-	editor = code --wait
 	pager = delta
 	whitespace = space-before-tab,-indent-with-non-tab,trailing-space
 	autocrlf = input
@@ -29,9 +28,6 @@
 
 [gpg "ssh"]
 	allowedSignersFile = ~/.config/git/allowed-signers
-
-[credential]
-	helper = osxkeychain
 
 [diff]
 	algorithm = histogram
@@ -92,4 +88,5 @@
 	defaultBranch = main
 
 [include]
+	path = config.macos
 	path = config.local

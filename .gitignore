@@ -59,6 +59,7 @@ zsh/plugins.zsh
 zsh/.zcompdump*
 zsh/conf.d/local.zsh
 git/config.local
+git/config.macos
 gh/hosts.yml
 
 # Common junk

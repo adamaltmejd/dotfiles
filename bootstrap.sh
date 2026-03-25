@@ -82,8 +82,11 @@ if [[ -z "$PROFILE" ]]; then
     log "Auto-detected profile: $PROFILE"
 fi
 
-# Build final args: --yes skips confirmation (stdin isn't a tty in a pipe)
-SETUP_ARGS=("--profile" "$PROFILE" "--yes" "${PASSTHROUGH_ARGS[@]+"${PASSTHROUGH_ARGS[@]}"}")
+# In a pipe (curl | bash), stdin isn't a tty — skip interactive prompts.
+# When run directly, let setup.sh prompt normally.
+SETUP_ARGS=("--profile" "$PROFILE")
+[[ ! -t 0 ]] && SETUP_ARGS+=("--yes")
+SETUP_ARGS+=("${PASSTHROUGH_ARGS[@]+"${PASSTHROUGH_ARGS[@]}"}")
 
 # --- Clone or update repo ---
 

@@ -1,11 +1,13 @@
-# Ensure ControlPath socket directory exists (see ssh/config)
+# Ensure ControlPath socket directory exists (see ssh/config.shared)
 [[ -d ~/.ssh/sockets ]] || mkdir -p ~/.ssh/sockets
 
 # Load SSH keys stored in macOS Keychain into the agent.
 # Without this, keys only enter the agent when used for an SSH connection
 # (due to AddKeysToAgent), so forwarded agents on remote hosts may be
 # missing keys like the git signing key.
-ssh-add --apple-load-keychain 2>/dev/null &!
+if [[ "$OSTYPE" == darwin* ]]; then
+    ssh-add --apple-load-keychain 2>/dev/null &!
+fi
 
 # Reset mouse tracking after SSH (prevents garbage on click after ungraceful disconnect)
 ssh() {
