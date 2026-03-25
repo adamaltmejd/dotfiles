@@ -10,7 +10,7 @@ One-liner for a fresh machine (requires `curl` and `bash`):
 curl -fsSL https://raw.githubusercontent.com/adamaltmejd/dotfiles/main/bootstrap.sh | bash
 ```
 
-This auto-detects your OS (macOS → `local`, Linux → `server`), installs git if needed, clones the repo to `~/.config/dotfiles`, and runs setup.
+This auto-detects your OS (macOS → `local`, Linux → `server`), installs git if needed, clones the repo to `~/.config`, and runs setup.
 
 ### Options
 
@@ -23,16 +23,13 @@ curl -fsSL .../bootstrap.sh | bash -s -- --dry-run
 
 # Enable specific features on server
 curl -fsSL .../bootstrap.sh | bash -s -- --with-claude --with-starship
-
-# Custom clone location
-curl -fsSL .../bootstrap.sh | bash -s -- --dotfiles-dir ~/dotfiles
 ```
 
 ### Manual setup
 
 ```bash
-git clone https://github.com/adamaltmejd/dotfiles.git ~/.config/dotfiles
-cd ~/.config/dotfiles
+git clone https://github.com/adamaltmejd/dotfiles.git ~/.config
+cd ~/.config
 ./setup.sh --profile local --dry-run   # preview
 ./setup.sh --profile local             # run (prompts for confirmation)
 exec zsh

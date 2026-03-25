@@ -5,7 +5,7 @@
 set -euo pipefail
 
 REPO_URL="https://github.com/adamaltmejd/dotfiles.git"
-DOTFILES_TARGET="${DOTFILES_DIR:-$HOME/.config/dotfiles}"
+DOTFILES_TARGET="${DOTFILES_DIR:-$HOME/.config}"
 BRANCH="${DOTFILES_BRANCH:-main}"
 
 log()  { printf '[bootstrap] %s\n' "$*"; }
@@ -70,10 +70,6 @@ while [[ $# -gt 0 ]]; do
             BRANCH="${2:-}"
             shift 2
             ;;
-        --dotfiles-dir)
-            DOTFILES_TARGET="${2:-}"
-            shift 2
-            ;;
         *)
             PASSTHROUGH_ARGS+=("$1")
             shift
@@ -98,6 +94,12 @@ if [[ -d "$DOTFILES_TARGET/.git" ]]; then
     git -C "$DOTFILES_TARGET" fetch origin
     git -C "$DOTFILES_TARGET" checkout "$BRANCH"
     git -C "$DOTFILES_TARGET" pull --ff-only origin "$BRANCH"
+elif [[ -d "$DOTFILES_TARGET" ]]; then
+    log "$DOTFILES_TARGET exists — initializing repo in place..."
+    git -C "$DOTFILES_TARGET" init
+    git -C "$DOTFILES_TARGET" remote add origin "$REPO_URL"
+    git -C "$DOTFILES_TARGET" fetch origin
+    git -C "$DOTFILES_TARGET" checkout -b "$BRANCH" "origin/$BRANCH"
 else
     log "Cloning dotfiles to $DOTFILES_TARGET..."
     mkdir -p "$(dirname "$DOTFILES_TARGET")"
