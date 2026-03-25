@@ -301,6 +301,19 @@ if [[ "$OS_ID" == "darwin" && "$APPLY" -eq 1 ]]; then
     unset _op_ref _op_target
 fi
 
+# macOS defaults (interactive opt-in)
+if [[ "$OS_ID" == "darwin" && "$APPLY" -eq 1 ]]; then
+    if [[ -t 0 ]] && [[ "$AUTO_YES" -eq 0 ]]; then
+        printf '\nApply macOS defaults (keyboard, Finder, Dock, etc.)? [y/N] '
+        read -r answer
+        if [[ "$answer" =~ ^[Yy] ]]; then
+            "$DOTFILES_DIR/macos/apply-defaults.zsh"
+        fi
+    else
+        log_info "Skipping macOS defaults (non-interactive). Run manually: $DOTFILES_DIR/macos/apply-defaults.zsh"
+    fi
+fi
+
 log_info "Verify: zsh -i -c 'exit'"
 log_info "Verify: git config --list | head"
 if [[ "$DOTFILES_FEAT_R" -eq 1 ]]; then
