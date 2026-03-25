@@ -54,8 +54,6 @@
 !setup/**
 !docs/
 !docs/**
-!legacy/
-!legacy/README.md
 
 # Ignore generated/local files within tracked dirs
 zsh/plugins.zsh
