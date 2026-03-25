@@ -267,8 +267,8 @@ if command -v git >/dev/null 2>&1 && git -C "$DOTFILES_DIR" rev-parse --is-insid
     unset _origin_url
 fi
 
-# 1Password SSH config injection (interactive only, macOS)
-if [[ "$OS_ID" == "darwin" && "$APPLY" -eq 1 ]]; then
+# 1Password SSH config injection (local profile, interactive only)
+if [[ "$PROFILE" == "local" && "$APPLY" -eq 1 ]]; then
     _op_ref="op://Work/ir2amtuqlhxc6oyaxhgwiixum4/ssh config"
     _op_target="$DOTFILES_DIR/ssh/config.d/SOFI.local"
     if [[ -t 0 ]] && command -v op >/dev/null 2>&1; then

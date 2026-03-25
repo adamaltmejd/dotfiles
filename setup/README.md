@@ -13,6 +13,7 @@ This directory contains implementation details for `../setup.sh`.
   - `packages.shared.txt`: installed for all profiles
   - `packages.local.txt`: local profile packages
   - `packages.server.txt`: server profile packages
+  - `packages.feat-*.txt`: feature-gated packages (matched to `DOTFILES_FEAT_<NAME>` by filename)
 
 ## Design Goals
 
