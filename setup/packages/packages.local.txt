@@ -1,2 +1,0 @@
-# Local-machine focused packages.
-# Note: eza, bat, fd moved to smartcli feature flag.
