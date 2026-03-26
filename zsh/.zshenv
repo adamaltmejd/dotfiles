@@ -26,8 +26,8 @@ path=(
   "$HOME/.local/bin"
   "$HOME/.bun/bin"
   $path
-  "/Applications/Obsidian.app/Contents/MacOS"
 )
+[[ "$OSTYPE" == darwin* ]] && path+=("/Applications/Obsidian.app/Contents/MacOS")
 
 #
 # Editors
