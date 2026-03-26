@@ -1,0 +1,6 @@
+CPPFLAGS += -I/opt/homebrew/include
+LDFLAGS += -L/opt/homebrew/lib
+
+# Homebrew gfortran (overrides R's hardcoded /opt/gfortran paths)
+FC = /opt/homebrew/bin/gfortran
+FLIBS = -L/opt/homebrew/lib/gcc/current -lgfortran -lquadmath
