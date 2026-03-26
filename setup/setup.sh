@@ -2,15 +2,16 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+DOTFILES_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 
-# shellcheck source=setup/lib/common.sh
-source "$SCRIPT_DIR/setup/lib/common.sh"
-# shellcheck source=setup/lib/detect.sh
-source "$SCRIPT_DIR/setup/lib/detect.sh"
-# shellcheck source=setup/lib/link.sh
-source "$SCRIPT_DIR/setup/lib/link.sh"
-# shellcheck source=setup/lib/packages.sh
-source "$SCRIPT_DIR/setup/lib/packages.sh"
+# shellcheck source=lib/common.sh
+source "$SCRIPT_DIR/lib/common.sh"
+# shellcheck source=lib/detect.sh
+source "$SCRIPT_DIR/lib/detect.sh"
+# shellcheck source=lib/link.sh
+source "$SCRIPT_DIR/lib/link.sh"
+# shellcheck source=lib/packages.sh
+source "$SCRIPT_DIR/lib/packages.sh"
 
 usage() {
     cat <<'USAGE'
@@ -125,7 +126,6 @@ else
     APPLY=0
 fi
 
-DOTFILES_DIR="$SCRIPT_DIR"
 OS_ID="$(detect_os)"
 PKG_MANAGER="$(detect_package_manager)"
 SUDO_OK="$(detect_sudo "$NO_SUDO")"
@@ -213,6 +213,8 @@ if [[ "$DOTFILES_FEAT_R" -eq 1 ]]; then
     link_file "$DOTFILES_DIR/r/Rprofile" "$HOME/.Rprofile" "$BACKUP_DIR"
     link_file "$DOTFILES_DIR/r/Renviron" "$HOME/.Renviron" "$BACKUP_DIR"
     link_file "$DOTFILES_DIR/r/lintr" "$HOME/.lintr" "$BACKUP_DIR"
+    ensure_dir "$HOME/.R"
+    link_file "$DOTFILES_DIR/r/Makevars" "$HOME/.R/Makevars" "$BACKUP_DIR"
 else
     log_info "Skipping R dotfiles (use --with-r to include)."
 fi
@@ -258,7 +260,7 @@ else
 
     # On macOS local, install casks and build deps from Brewfile
     if [[ "$OS_ID" == "darwin" && "$PROFILE" == "local" && "$PKG_MANAGER" == "brew" ]]; then
-        local_brewfile="$DOTFILES_DIR/macos/packages.Brewfile"
+        local_brewfile="$DOTFILES_DIR/setup/packages/packages.macos.Brewfile"
         if [[ -f "$local_brewfile" ]]; then
             log_info "Installing macOS packages from Brewfile..."
             run_or_print brew bundle --file="$local_brewfile"
@@ -324,10 +326,10 @@ if [[ "$OS_ID" == "darwin" && "$APPLY" -eq 1 ]]; then
         printf '\nApply macOS defaults (keyboard, Finder, Dock, etc.)? [y/N] '
         read -r answer
         if [[ "$answer" =~ ^[Yy] ]]; then
-            "$DOTFILES_DIR/macos/apply-defaults.zsh"
+            "$DOTFILES_DIR/setup/macos-defaults.zsh"
         fi
     else
-        log_info "Skipping macOS defaults (non-interactive). Run manually: $DOTFILES_DIR/macos/apply-defaults.zsh"
+        log_info "Skipping macOS defaults (non-interactive). Run manually: $DOTFILES_DIR/setup/macos-defaults.zsh"
     fi
 fi
 

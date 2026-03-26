@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Curl-to-bash bootstrap for dotfiles.
-# Usage: curl -fsSL https://raw.githubusercontent.com/adamaltmejd/dotfiles/main/bootstrap.sh | bash
+# Usage: curl -fsSL https://raw.githubusercontent.com/adamaltmejd/dotfiles/main/setup/bootstrap.sh | bash
 #   With options: ... | bash -s -- --profile server --with-claude
 set -euo pipefail
 
@@ -109,9 +109,9 @@ else
     git clone --branch "$BRANCH" "$REPO_URL" "$DOTFILES_TARGET"
 fi
 
-[[ -x "$DOTFILES_TARGET/setup.sh" ]] || die "setup.sh not found in $DOTFILES_TARGET — clone may have failed"
+[[ -x "$DOTFILES_TARGET/setup/setup.sh" ]] || die "setup.sh not found in $DOTFILES_TARGET/setup/ — clone may have failed"
 
 # --- Run setup ---
 
 log "Running setup..."
-exec "$DOTFILES_TARGET/setup.sh" "${SETUP_ARGS[@]}"
+exec "$DOTFILES_TARGET/setup/setup.sh" "${SETUP_ARGS[@]}"
