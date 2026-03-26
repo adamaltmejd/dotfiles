@@ -1,0 +1,23 @@
+// Zellij config — XDG native at ~/.config/zellij/config.kdl
+
+// Use Ghostty for local splits; zellij is for session persistence on servers
+default_layout "compact"
+pane_frames false
+default_shell "zsh"
+
+// Don't grab mouse — let terminal handle it
+mouse_mode false
+
+// Session behavior
+on_force_close "detach"
+session_serialization true
+serialize_pane_viewport true
+
+// Copy to system clipboard when available
+copy_on_select true
+
+// Disable default keybinding clutter — keep it minimal
+simplified_ui true
+
+// Theme
+theme "default"
