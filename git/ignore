@@ -18,3 +18,6 @@ Thumbs.db
 *.swp
 
 **/.claude/settings.local.json
+
+# direnv
+.envrc
