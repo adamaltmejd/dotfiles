@@ -3,5 +3,4 @@
 
 zsh
 git
-tmux
 ripgrep

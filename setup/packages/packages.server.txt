@@ -2,3 +2,4 @@
 # Keep this lean and low-friction for remote hosts.
 
 htop
+zellij
