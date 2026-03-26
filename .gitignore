@@ -5,8 +5,6 @@
 !.gitignore
 !README.md
 !CLAUDE.md
-!bootstrap.sh
-!setup.sh
 
 # Zsh configuration
 !zsh/
@@ -26,6 +24,7 @@
 !r/
 !r/Rprofile
 !r/Renviron
+!r/Makevars
 !r/lintr
 
 # Radian (R console)
@@ -44,9 +43,9 @@
 !agents/
 !agents/**
 
-# macOS helper files
-!macos/
-!macos/**
+# Zellij
+!zellij/
+!zellij/**
 
 # Setup internals and docs
 !setup/
@@ -55,7 +54,7 @@
 setup/profile
 zsh/plugins.zsh
 zsh/.zcompdump*
-zsh/conf.d/local.zsh
+zsh/local.zsh
 git/config.local
 git/config.macos
 gh/hosts.yml

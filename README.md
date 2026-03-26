@@ -7,7 +7,7 @@ XDG-compliant dotfiles for macOS and Linux, with profile-aware setup.
 One-liner for a fresh machine (requires `curl` and `bash`):
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/adamaltmejd/dotfiles/main/bootstrap.sh | bash
+curl -fsSL https://raw.githubusercontent.com/adamaltmejd/dotfiles/main/setup/bootstrap.sh | bash
 ```
 
 This auto-detects your OS (macOS → `local`, Linux → `server`), installs git if needed, clones the repo to `~/.config`, and runs setup.
@@ -30,8 +30,8 @@ curl -fsSL .../bootstrap.sh | bash -s -- --with-claude --with-starship
 ```bash
 git clone https://github.com/adamaltmejd/dotfiles.git ~/.config
 cd ~/.config
-./setup.sh --profile local --dry-run   # preview
-./setup.sh --profile local             # run (prompts for confirmation)
+./setup/setup.sh --profile local --dry-run   # preview
+./setup/setup.sh --profile local             # run (prompts for confirmation)
 exec zsh
 ```
 
@@ -46,7 +46,7 @@ Setup writes a minimal `~/.zshenv` that sets XDG variables and points `ZDOTDIR` 
 | | `local` (macOS default) | `server` (Linux default) |
 |---|---|---|
 | Shell + git config | yes | yes |
-| Packages | full Brewfile + shared | shared + htop |
+| Packages | full Brewfile + shared | shared + htop + zellij |
 | [Modern CLI tools](#modern-cli-tools) | yes (starship, eza, bat, fd, fzf, zoxide) | no |
 | direnv | yes | no |
 | R dotfiles | yes | no |
@@ -85,23 +85,24 @@ Installed on `local` profile (or with `--with-smartcli`):
 
 ## Secrets
 
-Managed via 1Password CLI (`op`). No secrets are stored in this repository. Loaded at shell startup via `zsh/secrets.zsh`.
+Managed via 1Password CLI (`op`). `op://` references are committed; values resolved at runtime. See `zsh/.zshrc` for auto-load and `load_secrets()`.
 
 ## Repository layout
 
 ```
 dotfiles/
-├── bootstrap.sh            # curl-to-bash entry point
-├── setup.sh                # main setup script
 ├── setup/
+│   ├── bootstrap.sh        # curl-to-bash entry point
+│   ├── setup.sh            # main setup script
 │   ├── lib/                # detection, linking, package helpers
-│   └── packages/           # package manifests (shared, local, server)
+│   ├── macos-defaults.zsh  # macOS system defaults
+│   └── packages/           # package manifests (shared, local, server, Brewfile)
 ├── zsh/                    # ZDOTDIR — .zshrc, .zshenv, conf.d/
 ├── git/                    # git config
 ├── ssh/                    # ssh config + config.d/ for hosts
-├── macos/                  # Brewfile, apply-defaults.zsh
-├── r/                      # Rprofile, Renviron, lintr
+├── r/                      # Rprofile, Renviron, Makevars, lintr
 ├── radian/                 # radian console config
+├── zellij/                 # zellij multiplexer config (server use)
 ├── agents/                 # AI agent configs + shared skills
 │   ├── claude/             # Claude Code settings
 │   ├── codex/              # Codex CLI config + rules
