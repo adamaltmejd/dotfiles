@@ -55,6 +55,7 @@ setup/profile
 zsh/plugins.zsh
 zsh/.zcompdump*
 zsh/local.zsh
+zsh/secrets/local.zsh
 git/config.local
 git/config.macos
 gh/hosts.yml
