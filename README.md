@@ -85,7 +85,16 @@ Installed on `local` profile (or with `--with-smartcli`):
 
 ## Secrets
 
-Managed via 1Password CLI (`op`). `op://` references are committed; values resolved at runtime. See `zsh/.zshrc` for auto-load and `load_secrets()`.
+Managed via 1Password CLI (`op`) and direnv. Templates in `zsh/secrets/` contain `op://` references. A custom `use_op` direnv function (defined in `direnv/direnvrc`) resolves references via `op inject`, caches the result, and exports as env vars.
+
+Usage in any `.envrc`:
+```bash
+use op ~/.config/zsh/secrets/base.env        # global secrets
+use op .secrets.env.tpl                       # project-specific (optional)
+dotenv_if_exists .secrets.env                 # plaintext overrides (optional)
+```
+
+On servers without `op`/direnv: use `zsh/secrets/local.zsh` (plaintext, gitignored).
 
 ## Repository layout
 
@@ -98,6 +107,7 @@ dotfiles/
 │   ├── macos-defaults.zsh  # macOS system defaults
 │   └── packages/           # package manifests (shared, local, server, Brewfile)
 ├── zsh/                    # ZDOTDIR — .zshrc, .zshenv, conf.d/
+├── direnv/                 # direnvrc with use_op helper
 ├── git/                    # git config
 ├── ssh/                    # ssh config + config.d/ for hosts
 ├── r/                      # Rprofile, Renviron, Makevars, lintr

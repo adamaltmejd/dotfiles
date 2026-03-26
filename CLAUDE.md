@@ -19,7 +19,7 @@ Each tool has its own directory (`zsh/`, `git/`, `r/`, `ssh/`, etc.) using XDG-n
 - Per-machine overrides: `zsh/local.zsh` (gitignored)
 - SSH hosts: `ssh/config.d/` (`*.local` gitignored)
 - New tool: own directory if XDG-native, otherwise add symlink in `setup.sh`
-- Secrets via 1Password CLI (`op inject`). `op://` references committed in `zsh/autoloaded_secrets.zsh` (cached on startup) and `zsh/lazy_secrets.zsh` (loaded with `load_secrets()`)
+- Secrets via direnv + 1Password CLI. Templates with `op://` refs in `zsh/secrets/`. Custom `use_op` in `direnv/direnvrc` resolves and caches. Per-project `.envrc` loads secrets with `use op <template>`
 
 ## Coding style
 

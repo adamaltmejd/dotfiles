@@ -70,7 +70,7 @@ if feat starship && (( $+commands[starship] )); then
     }
     zle -N zle-line-init
 fi
-if feat direnv && (( $+commands[direnv] )); then
+if (( $+commands[direnv] )); then
     eval "$(direnv hook zsh)"
 fi
 if feat smartcli && (( $+commands[zoxide] )); then
