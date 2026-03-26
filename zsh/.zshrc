@@ -111,6 +111,6 @@ fi
 #
 # Host-local override (loaded last, wins on conflicts)
 #
-_host_local="${XDG_CONFIG_HOME:-$HOME/.config}/setup/host.local"
+_host_local="${XDG_CONFIG_HOME:-$HOME/.config}/zsh/local.zsh"
 [[ -r "$_host_local" ]] && source "$_host_local"
 unset _host_local
