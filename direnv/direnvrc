@@ -1,19 +1,35 @@
-# use_op — resolve 1Password op:// references in a dotenv template
+# use_op — resolve 1Password secrets
 #
 # Usage in .envrc:
-#   use op ~/.config/zsh/secrets/base.env      # global secrets
-#   use op .secrets.env.tpl                    # project-specific secrets
+#   use op ~/.config/zsh/secrets/base.env        # bulk: inject a dotenv template
+#   use op MY_SECRET op://vault/item/field       # single: read one secret
 #
 # Template format (dotenv, not shell):
 #   KEY=op://vault/item/field
 #
-# Resolved values are cached in $XDG_CACHE_HOME/direnv-op/ keyed on
-# the template's absolute path. Cache is invalidated when the template's
-# mtime changes. To force refresh after rotating a secret in 1Password:
+# Template results are cached in $XDG_CACHE_HOME/direnv-op/ keyed on the
+# template's absolute path. Cache invalidates when the template's mtime
+# changes. To force refresh after rotating a secret in 1Password:
 #   touch <template>   OR   rm -rf ${XDG_CACHE_HOME:-$HOME/.cache}/direnv-op/
 
 use_op() {
-    local tpl="${1:?use_op requires a template path}"
+    if ! has op; then
+        log_error "use_op: op (1Password CLI) not found"
+        return 1
+    fi
+
+    if [[ $# -eq 2 ]]; then
+        local name="$1" ref="$2"
+        local val
+        if ! val=$(op read "$ref" 2>/dev/null); then
+            log_error "use_op: failed to read $ref"
+            return 1
+        fi
+        export "$name=$val"
+        return
+    fi
+
+    local tpl="${1:?use_op requires a template path or NAME REF}"
     tpl="$(cd "$(dirname "$tpl")" && pwd)/$(basename "$tpl")"
 
     if [[ ! -r "$tpl" ]]; then
@@ -21,20 +37,13 @@ use_op() {
         return 1
     fi
 
-    if ! has op; then
-        log_error "use_op: op (1Password CLI) not found"
-        return 1
-    fi
-
     local cache_dir="${XDG_CACHE_HOME:-$HOME/.cache}/direnv-op"
     mkdir -p "$cache_dir"
 
-    # Cache key: sha256 of the absolute path
     local cache_key
     cache_key=$(printf '%s' "$tpl" | shasum -a 256 | cut -d' ' -f1)
     local cache_file="$cache_dir/$cache_key"
 
-    # Invalidate when template is newer than cache
     if [[ ! -f "$cache_file" || "$tpl" -nt "$cache_file" ]]; then
         log_status "resolving secrets from $(user_rel_path "$tpl")"
         if ! op inject --in-file "$tpl" > "$cache_file" 2>/dev/null; then
