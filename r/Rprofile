@@ -18,7 +18,9 @@ Sys.setenv(TZ = "Europe/Stockholm")
 
 # --- renv ---------------------------------------------------------------------
 options(renv.config.ppm.enabled = TRUE)
+# Set as both option and env var — renv ignores the option during restore/rebuild
 options(renv.config.repos.override = getOption("repos"))
+Sys.setenv(RENV_CONFIG_REPOS_OVERRIDE = getOption("repos")[["CRAN"]])
 options(
     renv.settings = list(
         snapshot.type = "implicit",
@@ -61,12 +63,15 @@ if (interactive()) {
     if (!nzchar(Sys.getenv("RADIAN_VERSION"))) {
         q <- function(save = "no", ...) quit(save = save, ...)
 
-        # https://github.com/jalvesaq/colorout
+        # https://github.com/jalvesaq/colorout (not an renv dependency)
         if (
             Sys.getenv("TERM") %in%
                 c("xterm-256color", "screen", "screen-256color")
         ) {
-            suppressMessages(require("colorout", lib.loc = "~/.R/packages"))
+            tryCatch(
+                loadNamespace("colorout", lib.loc = "~/.R/packages"),
+                error = function(e) invisible()
+            )
         }
 
         # Save history even with --no-save
