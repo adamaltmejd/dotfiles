@@ -12,6 +12,8 @@ brew "libfido2"
 
 # Shell and CLI
 brew "antidote"
+brew "shellcheck"
+brew "shfmt"
 brew "tlrc"
 brew "delta"
 brew "terminal-notifier"

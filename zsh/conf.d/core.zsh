@@ -119,7 +119,7 @@ bindkey "^A" beginning-of-line
 bindkey "^B" backward-char
 bindkey "^E" end-of-line
 bindkey "^D" delete-char
-bindkey "^K" kill-whole-line
+bindkey "^K" kill-line
 bindkey "^N" down-line-or-search
 bindkey "^P" up-line-or-search
 bindkey "^R" history-incremental-pattern-search-backward
@@ -207,6 +207,16 @@ fman() {
     page="$(man -k . | fzf --preview 'man {1}' | awk '{print $1}' | head -n 1)"
     [[ -n "$page" ]] && man "$page"
 }
+
+# Daily tips — prints on first shell of the day, callable via `tips`
+tips() { cat "$ZDOTDIR/tips.txt" }
+_tips_marker="${XDG_STATE_HOME:-$HOME/.local/state}/zsh/tips-$(date +%Y-%m-%d)"
+if [[ ! -f "$_tips_marker" ]]; then
+    mkdir -p "${_tips_marker:h}"
+    touch "$_tips_marker"
+    tips
+fi
+unset _tips_marker
 
 # Erase current session history
 erase_history() {

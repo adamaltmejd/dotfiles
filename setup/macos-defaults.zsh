@@ -63,6 +63,10 @@ defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad Clicking -bool
 # Disable natural scrolling
 defaults write NSGlobalDomain com.apple.swipescrolldirection -bool false
 
+# Enable three-finger drag
+defaults write com.apple.AppleMultitouchTrackpad TrackpadThreeFingerDrag -bool true
+defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadThreeFingerDrag -bool true
+
 ###############################################################################
 # Finder                                                                      #
 ###############################################################################

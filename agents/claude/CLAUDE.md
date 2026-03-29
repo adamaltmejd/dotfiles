@@ -10,8 +10,8 @@
   - Add comments when: (1) purpose of code block is unclear, (2) we deviate from conventions, (3) to inform about gotchas/footguns that can't be eliminated.
   - Do not overengineer. Strive for clean, simple, and efficient code.
 - **Tools**
-  - lint with `ruff check` (python)
-  - format with `ruff format`(python) and `air` (R)
+  - lint with `ruff check` (python), `shellcheck` (sh/bash/zsh)
+  - format with `ruff format` (python), `air` (R), `shfmt` (sh/bash)
   - `uv` for python
   - `bun` not node/npm
   - `rg` not grep
