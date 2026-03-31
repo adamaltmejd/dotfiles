@@ -43,6 +43,13 @@
 !agents/
 !agents/**
 
+# uv (Python)
+!uv/
+!uv/uv.toml
+
+# Bun (JS)
+!.bunfig.toml
+
 # Direnv
 !direnv/
 !direnv/**

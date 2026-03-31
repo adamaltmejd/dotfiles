@@ -17,3 +17,4 @@
   - `rg` not grep
   - `fd` not find
   - `tree`
+- **Package security**: 7-day minimum release age

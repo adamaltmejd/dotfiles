@@ -21,6 +21,10 @@ Each tool has its own directory (`zsh/`, `git/`, `r/`, `ssh/`, etc.) using XDG-n
 - New tool: own directory if XDG-native, otherwise add symlink in `setup.sh`
 - Secrets via direnv + 1Password CLI. Templates with `op://` refs in `zsh/secrets/`. Custom `use_op` in `direnv/direnvrc` resolves and caches. Per-project `.envrc` loads secrets with `use op <template>`
 
+## Package manager supply chain safety
+
+Global configs (`uv/uv.toml`, `.bunfig.toml`) enforce a 7-day minimum release age on packages. If a `bun install` or `uv` resolution fails because a recently published version is filtered out, **do not bypass the age gate**. Instead: pin an older version that satisfies the constraint, or flag the issue to the user. bun disables lifecycle scripts by default; npm uses `ignore-scripts=true`.
+
 ## Coding style
 
 Zsh syntax for shell scripts. Simple, portable, efficient, semantic naming.
