@@ -4,6 +4,73 @@
 
 [[ -r "$ZDOTDIR/secrets/local.zsh" ]] && source "$ZDOTDIR/secrets/local.zsh"
 
+# Run a command with sensitive 1Password secrets resolved on demand. Secrets
+# registered in .envrc via `use op --lazy NAME op://...` or `use op --lazy <tpl>`
+# are injected by `op run` only into this command's subprocess: never cached,
+# never in your shell env, 1Password prompts at exec time.
+#   oprun Rscript analysis.R
+# Leading flags are forwarded to `op run`; parsing stops at the first non-flag arg
+# or an explicit `--`, so the command keeps any `--` of its own:
+#   oprun --no-masking -- radian   # if masking garbles an interactive REPL
+#   oprun rg -- pattern            # runs `rg -- pattern` unchanged
+# op flags taking a value must use --flag=value form (e.g. --account=Work).
+oprun() {
+    emulate -L zsh
+    if ! command -v op >/dev/null 2>&1; then
+        print -u2 "oprun: op (1Password CLI) not found"
+        return 1
+    fi
+    if [[ -z "$OP_RUN_LAZY" ]]; then
+        print -u2 "oprun: no lazy secrets registered — add 'use op --lazy ...' to .envrc"
+        return 1
+    fi
+
+    # getopt-style: consume leading op-run flags, stop at the first non-flag arg
+    # or an explicit `--` (consumed). The rest in $@ is the command, passed
+    # verbatim — so a command with its own `--` (e.g. `oprun rg -- pattern`) works.
+    local -a run_opts
+    while (( $# )); do
+        case "$1" in
+            --) shift; break ;;
+            -*) run_opts+=("$1"); shift ;;
+            *)  break ;;
+        esac
+    done
+    if (( ! $# )); then
+        print -u2 "oprun: no command — usage: oprun [op-run flags] [--] <command> [args...]"
+        return 1
+    fi
+
+    # Fail closed: a process substitution's exit status is discarded, so validate
+    # every registered template up front (where `return` counts) and abort before
+    # running anything. Otherwise a deleted template — or a directory, which `cat`
+    # cannot read — would be silently omitted and the command would run against its
+    # defaults. Require a regular, readable file. Inline refs (r) can't fail.
+    local entry tpl
+    for entry in "${(@f)OP_RUN_LAZY}"; do
+        [[ "$entry" == f$'\t'* ]] || continue
+        tpl="${entry#f$'\t'}"
+        if [[ ! -f "$tpl" || ! -r "$tpl" ]]; then
+            print -u2 "oprun: lazy template not a readable file: $tpl"
+            return 1
+        fi
+    done
+
+    # Stream every registered source — templates (f) and inline refs (r) — into a
+    # single env-file in declaration order. op run resolves the op:// refs into the
+    # child only, and is last-wins across and within env-files, so a later --lazy
+    # override beats an earlier one. Process substitution keeps the refs off disk.
+    op run "${run_opts[@]}" --env-file=<(
+        local entry
+        for entry in "${(@f)OP_RUN_LAZY}"; do
+            case "$entry" in
+                f$'\t'*) cat -- "${entry#f$'\t'}"; print ;;
+                r$'\t'*) print -r -- "${entry#r$'\t'}" ;;
+            esac
+        done
+    ) -- "$@"
+}
+
 direnv-init() {
     if [[ -f .envrc ]]; then
         echo "error: .envrc already exists" >&2
@@ -18,6 +85,11 @@ use op ~/.config/zsh/secrets/base.env
 #
 # Bulk secrets from a template file:
 #   use op .secrets.env.tpl
+#
+# Sensitive secrets (never cached, 1Password prompts on use):
+#   use op --lazy MY_SECRET op://vault/item/field
+#   use op --lazy .sensitive.env.tpl
+#   then run:  oprun <command>
 EOF
 
     if git rev-parse --is-inside-work-tree &>/dev/null; then
