@@ -23,12 +23,12 @@
 # never enters your shell env, so a plain run (without oprun) sees the var unset.
 # If a key is registered more than once, the last --lazy declaration wins.
 
-# Absolutize a template path and verify it is readable; prints the abspath.
+# Absolutize a template path and verify it is a readable file; prints the abspath.
 _op_template_path() {
     local tpl
-    tpl="$(cd "$(dirname "$1")" && pwd)/$(basename "$1")"
-    if [[ ! -r "$tpl" ]]; then
-        log_error "use_op: template not found: $tpl"
+    tpl="$(cd "$(dirname "$1")" 2>/dev/null && pwd)/$(basename "$1")"
+    if [[ ! -f "$tpl" || ! -r "$tpl" ]]; then
+        log_error "use_op: template not a readable file: $1"
         return 1
     fi
     printf '%s' "$tpl"

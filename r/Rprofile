@@ -51,7 +51,10 @@ op_lazy_load <- function(refs = NULL, overwrite = FALSE) {
     if (is.null(refs)) {
         registry <- Sys.getenv("OP_RUN_LAZY")
         # Sessions launched outside a direnv-hooked shell (e.g. an IDE like
-        # Positron/VS Code) don't inherit OP_RUN_LAZY — ask direnv for it.
+        # Positron/VS Code) don't inherit OP_RUN_LAZY — ask direnv for it. Use
+        # stdout regardless of direnv's exit status: that status reflects the
+        # whole .envrc, so an unrelated failing line (e.g. a `use op` template
+        # with 1Password locked) must not block the independent lazy refs.
         if (!nzchar(registry) && nzchar(Sys.which("direnv"))) {
             registry <- paste(
                 suppressWarnings(system2(
@@ -99,6 +102,10 @@ op_lazy_load <- function(refs = NULL, overwrite = FALSE) {
         }
     }
     if (!length(refs)) {
+        return(invisible(character()))
+    }
+    if (is.null(names(refs)) || !all(nzchar(names(refs)))) {
+        warning("op_lazy_load: `refs` must be named, e.g. c(NAME = \"op://vault/item/field\")", call. = FALSE)
         return(invisible(character()))
     }
     if (!nzchar(Sys.which("op"))) {
