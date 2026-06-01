@@ -15,11 +15,12 @@
 #   touch <template>   OR   rm -rf ${XDG_CACHE_HOME:-$HOME/.cache}/direnv-op/
 #
 # --lazy is the opposite: nothing is resolved at load time and nothing is cached.
-# It only registers the reference(s) — a single NAME/ref pair in $OP_RUN_REFS, or
-# a template path in $OP_RUN_ENV_FILES — so the `oprun` shell function (see
+# It only records each reference (an inline NAME/ref pair or a template path) in
+# declaration order in $OP_RUN_LAZY, so the `oprun` shell function (see
 # zsh/conf.d/secrets.zsh) can inject the secrets via `op run` at exec time.
 # 1Password prompts when you actually run the command, not on cd. The real value
 # never enters your shell env, so a plain run (without oprun) sees the var unset.
+# If a key is registered more than once, the last --lazy declaration wins.
 
 use_op() {
     if ! has op; then
@@ -28,9 +29,10 @@ use_op() {
     fi
 
     if [[ "$1" == "--lazy" ]]; then
+        local nl=$'\n' tab=$'\t'
         # Inline form: use op --lazy NAME op://vault/item/field
         if [[ $# -eq 3 ]]; then
-            local name="$2" ref="$3" nl=$'\n'
+            local name="$2" ref="$3"
             if [[ ! "$name" =~ ^[A-Za-z_][A-Za-z0-9_]*$ ]]; then
                 log_error "use op --lazy: invalid env var name: $name"
                 return 1
@@ -39,7 +41,7 @@ use_op() {
                 log_error "use op --lazy: reference must start with op:// — got: $ref"
                 return 1
             fi
-            export OP_RUN_REFS="${OP_RUN_REFS:+$OP_RUN_REFS$nl}$name=$ref"
+            export OP_RUN_LAZY="${OP_RUN_LAZY:+$OP_RUN_LAZY$nl}r${tab}$name=$ref"
             log_status "registered lazy secret $name — run via: oprun <cmd>"
             return
         fi
@@ -54,7 +56,7 @@ use_op() {
             log_error "use_op: template not found: $tpl"
             return 1
         fi
-        export OP_RUN_ENV_FILES="${OP_RUN_ENV_FILES:+$OP_RUN_ENV_FILES:}$tpl"
+        export OP_RUN_LAZY="${OP_RUN_LAZY:+$OP_RUN_LAZY$nl}f${tab}$tpl"
         watch_file "$tpl"
         log_status "registered lazy secrets $(user_rel_path "$tpl") — run via: oprun <cmd>"
         return

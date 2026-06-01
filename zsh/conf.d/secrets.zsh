@@ -20,7 +20,7 @@ oprun() {
         print -u2 "oprun: op (1Password CLI) not found"
         return 1
     fi
-    if [[ -z "$OP_RUN_ENV_FILES" && -z "$OP_RUN_REFS" ]]; then
+    if [[ -z "$OP_RUN_LAZY" ]]; then
         print -u2 "oprun: no lazy secrets registered — add 'use op --lazy ...' to .envrc"
         return 1
     fi
@@ -41,17 +41,21 @@ oprun() {
         return 1
     fi
 
-    local -a env_args ref_env
-    local f line
-    for f in "${(@s.:.)OP_RUN_ENV_FILES}"; do
-        [[ -n "$f" ]] && env_args+=(--env-file="$f")
-    done
-    for line in "${(@f)OP_RUN_REFS}"; do
-        [[ -n "$line" ]] && ref_env+=("$line")
-    done
-    # ref_env entries (NAME=op://...) enter op run's own env so it resolves them;
-    # `env` scopes them to this call so the raw refs never persist in the shell.
-    env "${ref_env[@]}" op run "${run_opts[@]}" "${env_args[@]}" -- "$@"
+    # Stream every registered source — templates (f) and inline refs (r) — into a
+    # single env-file in declaration order. op run resolves the op:// refs into the
+    # child only, and is last-wins across and within env-files, so a later --lazy
+    # override beats an earlier one. Process substitution keeps the refs off disk.
+    op run "${run_opts[@]}" --env-file=<(
+        local entry
+        for entry in "${(@f)OP_RUN_LAZY}"; do
+            case "$entry" in
+                f$'\t'*) entry="${entry#f$'\t'}"
+                    if [[ -r "$entry" ]]; then cat -- "$entry"; print
+                    else print -u2 "oprun: lazy template not readable: $entry"; fi ;;
+                r$'\t'*) print -r -- "${entry#r$'\t'}" ;;
+            esac
+        done
+    ) -- "$@"
 }
 
 direnv-init() {
