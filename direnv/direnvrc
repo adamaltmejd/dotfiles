@@ -1,21 +1,51 @@
 # use_op — resolve 1Password secrets
 #
 # Usage in .envrc:
-#   use op ~/.config/zsh/secrets/base.env        # bulk: inject a dotenv template
-#   use op MY_SECRET op://vault/item/field       # single: read one secret
+#   use op ~/.config/zsh/secrets/base.env        # bulk: inject a dotenv template (cached)
+#   use op MY_SECRET op://vault/item/field       # single: read one secret (not cached)
+#   use op --lazy MY_SECRET op://vault/item/field   # single ref, on-demand use (never cached)
+#   use op --lazy ~/.config/zsh/secrets/prod.env    # bulk template, on-demand use (never cached)
 #
 # Template format (dotenv, not shell):
 #   KEY=op://vault/item/field
 #
-# Template results are cached in $XDG_CACHE_HOME/direnv-op/ keyed on the
+# Cached forms write resolved values to $XDG_CACHE_HOME/direnv-op/ keyed on the
 # template's absolute path. Cache invalidates when the template's mtime
 # changes. To force refresh after rotating a secret in 1Password:
 #   touch <template>   OR   rm -rf ${XDG_CACHE_HOME:-$HOME/.cache}/direnv-op/
+#
+# --lazy is the opposite: nothing is resolved at load time and nothing is cached.
+# It only registers the reference(s) — a single NAME/ref pair in $OP_RUN_REFS, or
+# a template path in $OP_RUN_ENV_FILES — so the `oprun` shell function (see
+# zsh/conf.d/secrets.zsh) can inject the secrets via `op run` at exec time.
+# 1Password prompts when you actually run the command, not on cd. The real value
+# never enters your shell env, so a plain run (without oprun) sees the var unset.
 
 use_op() {
     if ! has op; then
         log_error "use_op: op (1Password CLI) not found"
         return 1
+    fi
+
+    if [[ "$1" == "--lazy" ]]; then
+        # Inline form: use op --lazy NAME op://vault/item/field
+        if [[ $# -eq 3 ]]; then
+            local name="$2" ref="$3" nl=$'\n'
+            export OP_RUN_REFS="${OP_RUN_REFS:+$OP_RUN_REFS$nl}$name=$ref"
+            log_status "registered lazy secret $name — run via: oprun <cmd>"
+            return
+        fi
+        # Template form: use op --lazy <path>
+        local tpl="${2:?use op --lazy requires NAME REF or a template path}"
+        tpl="$(cd "$(dirname "$tpl")" && pwd)/$(basename "$tpl")"
+        if [[ ! -r "$tpl" ]]; then
+            log_error "use_op: template not found: $tpl"
+            return 1
+        fi
+        export OP_RUN_ENV_FILES="${OP_RUN_ENV_FILES:+$OP_RUN_ENV_FILES:}$tpl"
+        watch_file "$tpl"
+        log_status "registered lazy secrets $(user_rel_path "$tpl") — run via: oprun <cmd>"
+        return
     fi
 
     if [[ $# -eq 2 ]]; then
