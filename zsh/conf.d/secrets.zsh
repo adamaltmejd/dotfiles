@@ -43,12 +43,15 @@ oprun() {
 
     # Fail closed: a process substitution's exit status is discarded, so validate
     # every registered template up front (where `return` counts) and abort before
-    # running anything. Otherwise a deleted template would be silently omitted and
-    # the command would run against its defaults. Inline refs (r) can't fail.
-    local entry
+    # running anything. Otherwise a deleted template — or a directory, which `cat`
+    # cannot read — would be silently omitted and the command would run against its
+    # defaults. Require a regular, readable file. Inline refs (r) can't fail.
+    local entry tpl
     for entry in "${(@f)OP_RUN_LAZY}"; do
-        if [[ "$entry" == f$'\t'* && ! -r "${entry#f$'\t'}" ]]; then
-            print -u2 "oprun: lazy template not readable: ${entry#f$'\t'}"
+        [[ "$entry" == f$'\t'* ]] || continue
+        tpl="${entry#f$'\t'}"
+        if [[ ! -f "$tpl" || ! -r "$tpl" ]]; then
+            print -u2 "oprun: lazy template not a readable file: $tpl"
             return 1
         fi
     done
