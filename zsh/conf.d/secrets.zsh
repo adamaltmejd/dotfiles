@@ -9,9 +9,11 @@
 # are injected by `op run` only into this command's subprocess: never cached,
 # never in your shell env, 1Password prompts at exec time.
 #   oprun Rscript analysis.R
-# To pass flags to `op run`, put them before a `--` separator (same convention as
-# `op run` itself). e.g. if masking garbles an interactive REPL:
-#   oprun --no-masking -- radian
+# Leading flags are forwarded to `op run`; parsing stops at the first non-flag arg
+# or an explicit `--`, so the command keeps any `--` of its own:
+#   oprun --no-masking -- radian   # if masking garbles an interactive REPL
+#   oprun rg -- pattern            # runs `rg -- pattern` unchanged
+# op flags taking a value must use --flag=value form (e.g. --account=Work).
 oprun() {
     emulate -L zsh
     if ! command -v op >/dev/null 2>&1; then
@@ -23,27 +25,19 @@ oprun() {
         return 1
     fi
 
-    # Split args on `--`: before it goes to `op run`, after it is the command.
-    # With no `--`, all args are the command, so the common `oprun <cmd>` needs no
-    # separator. Not parsing op's flags ourselves lets value-taking flags (e.g.
-    # --account Work) pass through intact.
-    local -a run_opts cmd
-    local a seen_sep=0
-    for a in "$@"; do
-        if (( seen_sep )); then
-            cmd+=("$a")
-        elif [[ "$a" == "--" ]]; then
-            seen_sep=1
-        else
-            run_opts+=("$a")
-        fi
+    # getopt-style: consume leading op-run flags, stop at the first non-flag arg
+    # or an explicit `--` (consumed). The rest in $@ is the command, passed
+    # verbatim — so a command with its own `--` (e.g. `oprun rg -- pattern`) works.
+    local -a run_opts
+    while (( $# )); do
+        case "$1" in
+            --) shift; break ;;
+            -*) run_opts+=("$1"); shift ;;
+            *)  break ;;
+        esac
     done
-    if (( ! seen_sep )); then
-        cmd=("${run_opts[@]}")
-        run_opts=()
-    fi
-    if (( ! ${#cmd} )); then
-        print -u2 "oprun: no command — usage: oprun [op-run flags --] <command> [args...]"
+    if (( ! $# )); then
+        print -u2 "oprun: no command — usage: oprun [op-run flags] [--] <command> [args...]"
         return 1
     fi
 
@@ -57,7 +51,7 @@ oprun() {
     done
     # ref_env entries (NAME=op://...) enter op run's own env so it resolves them;
     # `env` scopes them to this call so the raw refs never persist in the shell.
-    env "${ref_env[@]}" op run "${run_opts[@]}" "${env_args[@]}" -- "${cmd[@]}"
+    env "${ref_env[@]}" op run "${run_opts[@]}" "${env_args[@]}" -- "$@"
 }
 
 direnv-init() {
