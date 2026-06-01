@@ -31,12 +31,24 @@ use_op() {
         # Inline form: use op --lazy NAME op://vault/item/field
         if [[ $# -eq 3 ]]; then
             local name="$2" ref="$3" nl=$'\n'
+            if [[ ! "$name" =~ ^[A-Za-z_][A-Za-z0-9_]*$ ]]; then
+                log_error "use op --lazy: invalid env var name: $name"
+                return 1
+            fi
+            if [[ "$ref" != op://* ]]; then
+                log_error "use op --lazy: reference must start with op:// — got: $ref"
+                return 1
+            fi
             export OP_RUN_REFS="${OP_RUN_REFS:+$OP_RUN_REFS$nl}$name=$ref"
             log_status "registered lazy secret $name — run via: oprun <cmd>"
             return
         fi
         # Template form: use op --lazy <path>
-        local tpl="${2:?use op --lazy requires NAME REF or a template path}"
+        if [[ $# -ne 2 ]]; then
+            log_error "use op --lazy: expected NAME REF or a single template path"
+            return 1
+        fi
+        local tpl="$2"
         tpl="$(cd "$(dirname "$tpl")" && pwd)/$(basename "$tpl")"
         if [[ ! -r "$tpl" ]]; then
             log_error "use_op: template not found: $tpl"
