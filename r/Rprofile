@@ -56,18 +56,24 @@ op_lazy_load <- function(refs = NULL, overwrite = FALSE) {
         refs <- character()
         for (entry in strsplit(registry, "\n", fixed = TRUE)[[1]]) {
             if (!nzchar(entry)) next
+            type <- substr(entry, 1L, 1L)
             payload <- substring(entry, 3L) # entries are "<type>\t<payload>"
-            lines <- switch(
-                substr(entry, 1L, 1L),
-                f = if (file.exists(payload)) {
-                    readLines(payload, warn = FALSE)
-                } else {
+            if (type == "r") {
+                lines <- payload
+            } else if (type == "f") {
+                # tryCatch keeps an unreadable/vanished template best-effort:
+                # warn and skip rather than let readLines() abort R startup.
+                lines <- tryCatch(
+                    suppressWarnings(readLines(payload, warn = FALSE)),
+                    error = function(e) NULL
+                )
+                if (is.null(lines)) {
                     warning("op_lazy_load: template not readable: ", payload, call. = FALSE)
                     next
-                },
-                r = payload,
+                }
+            } else {
                 next
-            )
+            }
             for (line in lines) {
                 line <- trimws(line)
                 if (!nzchar(line) || startsWith(line, "#")) next
