@@ -100,7 +100,7 @@ op_lazy_load <- function(refs = NULL, overwrite = FALSE) {
         targets <- targets[!nzchar(Sys.getenv(targets))]
     }
 
-    done <- character()
+    values <- list()
     for (name in targets) {
         value <- suppressWarnings(system2(
             "op", c("read", "--no-newline", refs[[name]]), stdout = TRUE
@@ -109,9 +109,12 @@ op_lazy_load <- function(refs = NULL, overwrite = FALSE) {
             warning("op_lazy_load: failed to read ", name, " (", refs[[name]], ")", call. = FALSE)
             next
         }
-        do.call(Sys.setenv, setNames(list(paste(value, collapse = "\n")), name))
-        done <- c(done, name)
+        values[[name]] <- paste(value, collapse = "\n")
     }
+    if (length(values)) {
+        do.call(Sys.setenv, values)
+    }
+    done <- if (length(values)) names(values) else character()
     if (interactive() && length(done)) {
         message("op_lazy_load: set ", paste(done, collapse = ", "))
     }

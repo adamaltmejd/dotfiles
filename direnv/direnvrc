@@ -16,11 +16,23 @@
 #
 # --lazy is the opposite: nothing is resolved at load time and nothing is cached.
 # It only records each reference (an inline NAME/ref pair or a template path) in
-# declaration order in $OP_RUN_LAZY, so the `oprun` shell function (see
-# zsh/conf.d/secrets.zsh) can inject the secrets via `op run` at exec time.
+# declaration order in $OP_RUN_LAZY, which two consumers parse: the `oprun`
+# shell function (zsh/conf.d/secrets.zsh) injects the secrets via `op run` at
+# exec time, and op_lazy_load() (r/Rprofile) sets them in an R session.
 # 1Password prompts when you actually run the command, not on cd. The real value
 # never enters your shell env, so a plain run (without oprun) sees the var unset.
 # If a key is registered more than once, the last --lazy declaration wins.
+
+# Absolutize a template path and verify it is readable; prints the abspath.
+_op_template_path() {
+    local tpl
+    tpl="$(cd "$(dirname "$1")" && pwd)/$(basename "$1")"
+    if [[ ! -r "$tpl" ]]; then
+        log_error "use_op: template not found: $tpl"
+        return 1
+    fi
+    printf '%s' "$tpl"
+}
 
 use_op() {
     if ! has op; then
@@ -50,12 +62,8 @@ use_op() {
             log_error "use op --lazy: expected NAME REF or a single template path"
             return 1
         fi
-        local tpl="$2"
-        tpl="$(cd "$(dirname "$tpl")" && pwd)/$(basename "$tpl")"
-        if [[ ! -r "$tpl" ]]; then
-            log_error "use_op: template not found: $tpl"
-            return 1
-        fi
+        local tpl
+        tpl="$(_op_template_path "$2")" || return 1
         export OP_RUN_LAZY="${OP_RUN_LAZY:+$OP_RUN_LAZY$nl}f${tab}$tpl"
         watch_file "$tpl"
         log_status "registered lazy secrets $(user_rel_path "$tpl") — run via: oprun <cmd>"
@@ -74,12 +82,7 @@ use_op() {
     fi
 
     local tpl="${1:?use_op requires a template path or NAME REF}"
-    tpl="$(cd "$(dirname "$tpl")" && pwd)/$(basename "$tpl")"
-
-    if [[ ! -r "$tpl" ]]; then
-        log_error "use_op: template not found: $tpl"
-        return 1
-    fi
+    tpl="$(_op_template_path "$tpl")" || return 1
 
     local cache_dir="${XDG_CACHE_HOME:-$HOME/.cache}/direnv-op"
     mkdir -p "$cache_dir"
