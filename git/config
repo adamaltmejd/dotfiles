@@ -65,6 +65,7 @@
 
 [tag]
 	sort = -version:refname
+	gpgsign = true
 
 [column]
 	ui = auto

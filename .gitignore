@@ -42,6 +42,11 @@
 # AI agents (Claude Code, Codex CLI, shared skills)
 !agents/
 !agents/**
+!.claude/
+!.claude/**
+.claude/scheduled_tasks.lock
+.claude/worktrees/
+.claude/settings.local.json
 
 # uv (Python)
 !uv/
@@ -61,6 +66,7 @@
 # Setup internals and docs
 !setup/
 !setup/**
+
 # Ignore generated/local files within tracked dirs
 setup/profile
 zsh/plugins.zsh
@@ -70,11 +76,22 @@ zsh/secrets/local.zsh
 git/config.local
 git/config.macos
 gh/hosts.yml
+r/fixest/
+r/modelsummary/
 
 # Common junk
 .DS_Store
+.Rhistory
 *.swp
 *~
+*.bak
 
 # Ignore local/sensitive files
 *.local
+
+# == Explicit ignores ==
+op
+mole
+b2
+cagent
+.wrangler
