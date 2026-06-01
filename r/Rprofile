@@ -25,7 +25,8 @@ options(
     renv.settings = list(
         snapshot.type = "implicit",
         use.cache = TRUE,
-        vcs.ignore.library = TRUE
+        vcs.ignore.library = TRUE,
+        ignored.packages = c("languageserver")
     )
 )
 
@@ -35,6 +36,81 @@ options(languageserver.formatting_style = function(options) {
     style$token$force_assignment_op <- NULL
     style
 })
+
+# --- Lazy 1Password secrets (companion to `use op --lazy` / `oprun`) ----------
+# Resolve op:// references and set them as env vars for this session, but only
+# those not already set — so a session launched via `oprun` (which pre-populates
+# them) is left alone and fires no extra 1Password prompt. Opt in per project by
+# calling op_lazy_load() from that project's .Rprofile.
+#   refs   explicit c(NAME = "op://vault/item/field", ...); defaults to parsing
+#          $OP_RUN_LAZY, the registry direnv exports from `use op --lazy`.
+# Best-effort by design: failures warn and continue (R startup must not break),
+# so keep guarding code with Sys.getenv(name, unset = <default>). This differs
+# from `oprun`, which fails closed because you ask for the secrets explicitly.
+op_lazy_load <- function(refs = NULL, overwrite = FALSE) {
+    if (is.null(refs)) {
+        registry <- Sys.getenv("OP_RUN_LAZY")
+        if (!nzchar(registry)) {
+            return(invisible(character()))
+        }
+        refs <- character()
+        for (entry in strsplit(registry, "\n", fixed = TRUE)[[1]]) {
+            if (!nzchar(entry)) next
+            payload <- substring(entry, 3L) # entries are "<type>\t<payload>"
+            lines <- switch(
+                substr(entry, 1L, 1L),
+                f = if (file.exists(payload)) {
+                    readLines(payload, warn = FALSE)
+                } else {
+                    warning("op_lazy_load: template not readable: ", payload, call. = FALSE)
+                    next
+                },
+                r = payload,
+                next
+            )
+            for (line in lines) {
+                line <- trimws(line)
+                if (!nzchar(line) || startsWith(line, "#")) next
+                eq <- regexpr("=", line, fixed = TRUE)
+                if (eq < 1L) next
+                name <- trimws(substr(line, 1L, eq - 1L))
+                ref <- trimws(substring(line, eq + 1L))
+                if (nzchar(name) && startsWith(ref, "op://")) {
+                    refs[[name]] <- ref # later declarations win
+                }
+            }
+        }
+    }
+    if (!length(refs)) {
+        return(invisible(character()))
+    }
+    if (!nzchar(Sys.which("op"))) {
+        warning("op_lazy_load: op (1Password CLI) not found", call. = FALSE)
+        return(invisible(character()))
+    }
+
+    targets <- names(refs)
+    if (!overwrite) {
+        targets <- targets[!nzchar(Sys.getenv(targets))]
+    }
+
+    done <- character()
+    for (name in targets) {
+        value <- suppressWarnings(system2(
+            "op", c("read", "--no-newline", refs[[name]]), stdout = TRUE
+        ))
+        if (!is.null(attr(value, "status"))) {
+            warning("op_lazy_load: failed to read ", name, " (", refs[[name]], ")", call. = FALSE)
+            next
+        }
+        do.call(Sys.setenv, setNames(list(paste(value, collapse = "\n")), name))
+        done <- c(done, name)
+    }
+    if (interactive() && length(done)) {
+        message("op_lazy_load: set ", paste(done, collapse = ", "))
+    }
+    invisible(done)
+}
 
 # --- Interactive session ------------------------------------------------------
 if (interactive()) {
