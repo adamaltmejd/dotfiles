@@ -41,6 +41,18 @@ oprun() {
         return 1
     fi
 
+    # Fail closed: a process substitution's exit status is discarded, so validate
+    # every registered template up front (where `return` counts) and abort before
+    # running anything. Otherwise a deleted template would be silently omitted and
+    # the command would run against its defaults. Inline refs (r) can't fail.
+    local entry
+    for entry in "${(@f)OP_RUN_LAZY}"; do
+        if [[ "$entry" == f$'\t'* && ! -r "${entry#f$'\t'}" ]]; then
+            print -u2 "oprun: lazy template not readable: ${entry#f$'\t'}"
+            return 1
+        fi
+    done
+
     # Stream every registered source — templates (f) and inline refs (r) — into a
     # single env-file in declaration order. op run resolves the op:// refs into the
     # child only, and is last-wins across and within env-files, so a later --lazy
@@ -49,9 +61,7 @@ oprun() {
         local entry
         for entry in "${(@f)OP_RUN_LAZY}"; do
             case "$entry" in
-                f$'\t'*) entry="${entry#f$'\t'}"
-                    if [[ -r "$entry" ]]; then cat -- "$entry"; print
-                    else print -u2 "oprun: lazy template not readable: $entry"; fi ;;
+                f$'\t'*) cat -- "${entry#f$'\t'}"; print ;;
                 r$'\t'*) print -r -- "${entry#r$'\t'}" ;;
             esac
         done
