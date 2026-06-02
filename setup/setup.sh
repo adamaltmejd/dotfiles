@@ -228,7 +228,10 @@ if [[ "$DOTFILES_FEAT_CLAUDE" -eq 1 ]]; then
     link_file "$DOTFILES_DIR/agents/claude/CLAUDE.md" "$HOME/.claude/CLAUDE.md" "$BACKUP_DIR"
     link_file "$DOTFILES_DIR/agents/skills" "$HOME/.claude/skills" "$BACKUP_DIR"
     link_file "$DOTFILES_DIR/agents/skills" "$HOME/.agents/skills" "$BACKUP_DIR"
-    link_file "$DOTFILES_DIR/agents/codex/config.toml" "$HOME/.codex/config.toml" "$BACKUP_DIR"
+    # config.toml is intentionally NOT linked: Codex owns and rewrites it at
+    # runtime (project trust levels, marketplace timestamps, desktop/tui state,
+    # injected MCP servers with machine paths). Tracking it produced constant
+    # churn, so it's gitignored and Codex creates its own on first run.
     link_file "$DOTFILES_DIR/agents/codex/rules/default.rules" "$HOME/.codex/rules/default.rules" "$BACKUP_DIR"
     link_file "$DOTFILES_DIR/agents/codex/AGENTS.md" "$HOME/.codex/AGENTS.md" "$BACKUP_DIR"
 else

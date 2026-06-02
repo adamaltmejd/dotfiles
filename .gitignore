@@ -47,6 +47,9 @@
 .claude/scheduled_tasks.lock
 .claude/worktrees/
 .claude/settings.local.json
+# Codex owns and rewrites config.toml at runtime (trust levels, marketplaces,
+# desktop/tui state, machine paths) — untracked to avoid churn. See setup.sh.
+agents/codex/config.toml
 
 # uv (Python)
 !uv/
