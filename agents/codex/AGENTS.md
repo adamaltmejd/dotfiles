@@ -6,13 +6,18 @@
 - **ASK** when uncertain of my intent
   - Use `AskUserQuestion` / `request_user_input` tool if available
 - **Coding style**: 
-  - Prefer self-documenting code over comments. Never add comments that simply restate names.
-  - Add comments when: (1) purpose of code block is unclear, (2) we deviate from conventions, (3) to inform about gotchas/footguns that can't be eliminated.
-  - Do not overengineer. Strive for clean, simple, and efficient code.
+  - Do not overengineer. 
+  - Strive for clean, simple, and efficient code.
+  - Prefer self-documenting code over comments.
+  - Add comments: 
+    (1) when purpose of code block is unclear, 
+    (2) when we deviate from conventions, 
+    (3) to inform about necessary gotchas/footguns, 
+    (4) to log dependencies/issues/events related to the specific code block
 - **Tools**
   - lint with `ruff check` (python), `shellcheck` (sh/bash/zsh)
   - format with `ruff format` (python), `air` (R), `shfmt` (sh/bash)
-  - `uv` for python
+  - `uv` for python, not pip
   - `bun` not node/npm
   - `rg` not grep
   - `fd` not find
