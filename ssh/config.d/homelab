@@ -3,14 +3,17 @@
 # `User`, `IdentityFile`, etc. apply correctly. The FQDN resolves via the
 # Tailscale split-DNS rule for home.altmejd.se → AdGuard → LAN IP, so on-LAN
 # traffic stays on LAN and off-LAN traffic uses the Tailscale subnet routers.
-Host *-sthlm *-breven
+# `sure` is the one LXC without a -sthlm/-breven suffix (cross-site singleton,
+# by design), so it's listed explicitly to get canonicalized like the rest.
+Host *-sthlm *-breven sure
     CanonicalizeHostname yes
     CanonicalDomains home.altmejd.se
     CanonicalizeMaxDots 0
 
 # PVE nodes — interactive login as root (password), Ansible as ansible (key)
-Host pve-sthlm.home.altmejd.se pve1-breven.home.altmejd.se 10.0.50.2 10.1.50.2
+Host pve-sthlm.home.altmejd.se pve1-breven.home.altmejd.se pve2-sthlm.home.altmejd.se 10.0.50.2 10.1.50.2 10.0.50.5
     PasswordAuthentication yes
+    SetEnv LANG=C.UTF-8 LC_ALL=C.UTF-8
 
 # Common settings for all homelab hosts. `User root` is the LXC default;
 # the PVE and VM blocks above override it via first-match-wins.

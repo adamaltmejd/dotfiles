@@ -2,6 +2,9 @@
 auto-update-channel = tip
 
 shell-integration = zsh
-shell-integration-features = true
+# `true` enables ssh-env, which re-forwards the Mac's en_US.UTF-8 locale into
+# remote sessions and overrides ssh-config SetEnv — breaks locale on C-only
+# hosts (homelab is C.UTF-8). no-ssh-env keeps everything else (incl. ssh-terminfo).
+shell-integration-features = no-ssh-env
 
 theme = Gruvbox Dark Hard

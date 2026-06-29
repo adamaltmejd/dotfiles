@@ -50,6 +50,11 @@
 # Codex owns and rewrites config.toml at runtime (trust levels, marketplaces,
 # desktop/tui state, machine paths) — untracked to avoid churn. See setup.sh.
 agents/codex/config.toml
+# agents/skills/ is allowlisted: installed marketplace skills (large, churn on
+# update) are ignored; curated skills are re-allowed explicitly below.
+agents/skills/*
+!agents/skills/web-design-reviewer/
+!agents/skills/web-design-reviewer/**
 
 # uv (Python)
 !uv/
@@ -98,3 +103,5 @@ mole
 b2
 cagent
 .wrangler
+homebrew
+opentofu

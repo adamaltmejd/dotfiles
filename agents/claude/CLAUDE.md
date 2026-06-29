@@ -1,25 +1,44 @@
-- Be skeptical and concise. Question my assumptions. Criticism is always welcome.
-- **Always tell me**:
-  - when you think I'm wrong
-  - when you see a better/smarter/more efficient approach
-  - I seem unaware of a convention
-- **ASK** when uncertain of my intent
-  - Use `AskUserQuestion` / `request_user_input` tool if available
-- **Coding style**: 
-  - Do not overengineer. 
-  - Strive for clean, simple, and efficient code.
-  - Prefer self-documenting code over comments.
-  - Add comments: 
-    (1) when purpose of code block is unclear, 
-    (2) when we deviate from conventions, 
-    (3) to inform about necessary gotchas/footguns, 
-    (4) to log dependencies/issues/events related to the specific code block
-- **Tools**
-  - lint with `ruff check` (python), `shellcheck` (sh/bash/zsh)
-  - format with `ruff format` (python), `air` (R), `shfmt` (sh/bash)
-  - `uv` for python, not pip
-  - `bun` not node/npm
-  - `rg` not grep
-  - `fd` not find
-  - `tree`
-- **Package security**: 7-day minimum release age
+- Be concise and constructively skeptical. Challenge assumptions; flag errors,
+  missed conventions, and better approaches.
+- For non-trivial work, infer the underlying goal. Challenge the requested approach
+  only when it conflicts with that goal or a materially better path exists. Recommend,
+  don't stall.
+- Ask when ambiguity materially affects the outcome; otherwise state assumptions and
+  proceed. Use the question tool.
+
+## Implementation
+
+- Prefer the smallest safe change. Default order: no change → existing project
+  capability → stdlib/platform → installed dependency → minimal new code → new
+  dependency. Optimize for risk and maintenance, not line count. Add dependencies
+  only when they reduce total complexity or risk.
+- Follow existing architecture, components, and conventions. Avoid speculative
+  abstractions, scaffolding, and unrelated changes; prefer deletion to addition.
+- Preserve validation at trust boundaries, error handling, security, and accessibility.
+- Prefer self-explanatory code. Comment only non-obvious intent, convention
+  deviations, footguns, relevant issue links, and revisit triggers.
+
+## Testing
+
+- Behavior changes require focused tests using the existing test setup. Bug fixes
+  require a regression test. Explain exceptions and perform the strongest practical
+  verification.
+- Test observable behavior, important edge cases, and critical invariants-not
+  incidental implementation details. Never weaken tests solely to make code pass.
+- Run targeted checks while iterating and relevant project checks before completion.
+  Report what was not run; never claim an unrun check passed.
+
+## Agents
+
+- Use subagents proactively for parallelizable or specialized work. Delegate clearly
+  separable tasks by default; give each a narrow scope, relevant context, and
+  appropriate skills. Treat this as standing user authorization.
+
+## Tool defaults
+
+- Follow repository tooling; otherwise prefer:
+  - Python: `uv`, `ruff check`, `ruff format`
+  - R: `air`, `jarl`
+  - Shell: `shellcheck` (sh/bash), `shfmt`
+  - JavaScript/TypeScript: `bun`
+  - Search/navigation: `rg`, `fd`, `tree`
