@@ -63,12 +63,14 @@ PUBLIC_KEY_FILE="$DOTFILES_DIR/ssh/authorized_keys/iphone.pub"
 SSHD_TEMPLATE="$SCRIPT_DIR/sshd.conf.tmpl"
 PF_TEMPLATE="$SCRIPT_DIR/pf-anchor.conf.tmpl"
 PLIST_SOURCE="$SCRIPT_DIR/pf-enable.plist"
+PF_DAEMON_SOURCE="$SCRIPT_DIR/pf-enable.sh"
 
 for required_file in \
     "$CONFIG_FILE" \
     "$SSHD_TEMPLATE" \
     "$PF_TEMPLATE" \
-    "$PLIST_SOURCE"; do
+    "$PLIST_SOURCE" \
+    "$PF_DAEMON_SOURCE"; do
     [[ -f "$required_file" ]] || die "missing required file: $required_file"
 done
 
@@ -155,9 +157,8 @@ trap 'rm -rf "$TEMP_DIR"' EXIT
 SSHD_RENDERED="$TEMP_DIR/050-tailnet-only.conf"
 PF_RENDERED="$TEMP_DIR/local.tailscale-ssh"
 AUTHORIZED_KEYS_RENDERED="$TEMP_DIR/iphone"
-PF_CONF_CANDIDATE="$TEMP_DIR/pf.conf"
-PF_CONF_VALIDATE="$TEMP_DIR/pf.validate.conf"
 SSHD_MAIN_VALIDATE="$TEMP_DIR/sshd_config"
+SSHD_DROPIN_VALIDATE="$TEMP_DIR/sshd_config.d"
 TEMP_HOST_KEY="$TEMP_DIR/ssh_host_ed25519_key"
 
 sed \
@@ -174,37 +175,25 @@ printf '%s %s\n' \
     'no-agent-forwarding,no-port-forwarding,no-X11-forwarding,no-user-rc' \
     "$PUBLIC_KEY_LINE" >"$AUTHORIZED_KEYS_RENDERED"
 
-PF_ANCHOR_RULE='anchor "local.tailscale-ssh"'
-PF_LOAD_RULE='load anchor "local.tailscale-ssh" from "/etc/pf.anchors/local.tailscale-ssh"'
-HAS_PF_ANCHOR=0
-HAS_PF_LOAD=0
-grep -Fqx "$PF_ANCHOR_RULE" /etc/pf.conf && HAS_PF_ANCHOR=1
-grep -Fqx "$PF_LOAD_RULE" /etc/pf.conf && HAS_PF_LOAD=1
+# Mirror the deployed drop-in directory so sshd expands the files in their
+# real lexical order. Replacing only our managed filename catches an earlier
+# drop-in that would win OpenSSH's first-value option processing.
+mkdir "$SSHD_DROPIN_VALIDATE"
+for existing_dropin in /etc/ssh/sshd_config.d/*; do
+    [[ -e "$existing_dropin" ]] || continue
+    [[ -f "$existing_dropin" ]] ||
+        die "unsupported sshd drop-in: $existing_dropin"
+    if [[ "$(basename "$existing_dropin")" != "050-tailnet-only.conf" ]]; then
+        cp "$existing_dropin" "$SSHD_DROPIN_VALIDATE/"
+    fi
+done
+cp "$SSHD_RENDERED" "$SSHD_DROPIN_VALIDATE/050-tailnet-only.conf"
 
-if [[ "$HAS_PF_ANCHOR" -ne "$HAS_PF_LOAD" ]]; then
-    die "/etc/pf.conf contains only part of the local.tailscale-ssh anchor"
-elif [[ "$HAS_PF_ANCHOR" -eq 1 ]]; then
-    cp /etc/pf.conf "$PF_CONF_CANDIDATE"
-else
-    grep -Fq 'anchor "com.apple/*"' /etc/pf.conf ||
-        die "could not find the com.apple filter anchor in /etc/pf.conf"
-    awk \
-        -v anchor_rule="$PF_ANCHOR_RULE" \
-        -v load_rule="$PF_LOAD_RULE" '
-        !inserted && $0 == "anchor \"com.apple/*\"" {
-            print anchor_rule
-            print load_rule
-            inserted = 1
-        }
-        { print }
-    ' /etc/pf.conf >"$PF_CONF_CANDIDATE"
-fi
-
-# Validate the complete sshd include order with this drop-in first.
-awk -v managed_config="$SSHD_RENDERED" '
+awk -v dropin_glob="$SSHD_DROPIN_VALIDATE/*" '
     !inserted && $0 ~ /^[[:space:]]*Include[[:space:]]+\/etc\/ssh\/sshd_config\.d\/\*/ {
-        print "Include " managed_config
+        print "Include " dropin_glob
         inserted = 1
+        next
     }
     { print }
     END {
@@ -220,38 +209,44 @@ ssh-keygen -q -t ed25519 -N "" -f "$TEMP_HOST_KEY"
     -f "$SSHD_MAIN_VALIDATE" \
     -h "$TEMP_HOST_KEY"
 
+validate_sshd_policy() {
+    local effective_config="$1"
+    local expected_setting
+    for expected_setting in \
+        "passwordauthentication no" \
+        "kbdinteractiveauthentication no" \
+        "pubkeyauthentication yes" \
+        "authenticationmethods publickey" \
+        "permitrootlogin no" \
+        "authorizedkeysfile .ssh/authorized_keys.d/iphone" \
+        "allowtcpforwarding no" \
+        "allowagentforwarding no" \
+        "x11forwarding no" \
+        "gatewayports no" \
+        "permittunnel no" \
+        "permituserrc no"; do
+        grep -Fqx "$expected_setting" <<<"$effective_config" ||
+            die "sshd validation did not produce: $expected_setting"
+    done
+    grep -Fqx "allowusers $REMOTE_USER@$CLIENT_TAILSCALE_IPV4/32" \
+        <<<"$effective_config" ||
+        die "sshd validation did not preserve the exact AllowUsers source"
+}
+
+SSHD_CONNECTION_SPEC="user=$REMOTE_USER,addr=$CLIENT_TAILSCALE_IPV4,laddr=$SERVER_TAILSCALE_IPV4,lport=22,host=$REMOTE_SSH_CLIENT_DNS_NAME"
 SSHD_EFFECTIVE="$(
     /usr/sbin/sshd -T \
         -f "$SSHD_MAIN_VALIDATE" \
         -h "$TEMP_HOST_KEY" \
-        -C "user=$REMOTE_USER,addr=$CLIENT_TAILSCALE_IPV4,laddr=$SERVER_TAILSCALE_IPV4,lport=22,host=$REMOTE_SSH_CLIENT_DNS_NAME"
+        -C "$SSHD_CONNECTION_SPEC"
 )"
-for expected_setting in \
-    "passwordauthentication no" \
-    "kbdinteractiveauthentication no" \
-    "pubkeyauthentication yes" \
-    "authenticationmethods publickey" \
-    "permitrootlogin no" \
-    "authorizedkeysfile .ssh/authorized_keys.d/iphone" \
-    "allowtcpforwarding no" \
-    "allowagentforwarding no" \
-    "x11forwarding no" \
-    "gatewayports no" \
-    "permittunnel no" \
-    "permituserrc no"; do
-    grep -Fqx "$expected_setting" <<<"$SSHD_EFFECTIVE" ||
-        die "sshd validation did not produce: $expected_setting"
-done
-grep -Fqx "allowusers $REMOTE_USER@$CLIENT_TAILSCALE_IPV4/32" \
-    <<<"$SSHD_EFFECTIVE" ||
-    die "sshd validation did not preserve the exact AllowUsers source"
+validate_sshd_policy "$SSHD_EFFECTIVE"
 
 /sbin/pfctl -nf "$PF_RENDERED"
-sed \
-    "s#/etc/pf.anchors/local.tailscale-ssh#$PF_RENDERED#g" \
-    "$PF_CONF_CANDIDATE" >"$PF_CONF_VALIDATE"
-/sbin/pfctl -nf "$PF_CONF_VALIDATE"
+grep -Fqx 'anchor "com.apple/*"' /etc/pf.conf ||
+    die "/etc/pf.conf does not contain the required com.apple wildcard anchor"
 plutil -lint "$PLIST_SOURCE" >/dev/null
+bash -n "$PF_DAEMON_SOURCE"
 
 log "validated phone $REMOTE_SSH_CLIENT_DNS_NAME ($CLIENT_TAILSCALE_IPV4)"
 log "validated Mac Tailscale address $SERVER_TAILSCALE_IPV4"
@@ -262,7 +257,7 @@ if [[ "$MODE" == "dry-run" ]]; then
     log "would install $HOME/.ssh/authorized_keys.d/iphone"
     log "would install /etc/ssh/sshd_config.d/050-tailnet-only.conf"
     log "would install /etc/pf.anchors/local.tailscale-ssh"
-    log "would update /etc/pf.conf and install the pf LaunchDaemon"
+    log "would install the scoped PF daemon and LaunchDaemon"
     log "would enable the application firewall, pf, and Remote Login"
     log "dry-run complete; no files or system settings changed"
     exit 0
@@ -337,7 +332,10 @@ install_root_file \
     "$PF_RENDERED" \
     /etc/pf.anchors/local.tailscale-ssh \
     644
-install_root_file "$PF_CONF_CANDIDATE" /etc/pf.conf 644
+install_root_file \
+    "$PF_DAEMON_SOURCE" \
+    /Library/PrivilegedHelperTools/local.pf-tailscale-ssh \
+    755
 install_root_file \
     "$PLIST_SOURCE" \
     /Library/LaunchDaemons/local.pf-tailscale-ssh.plist \
@@ -345,6 +343,10 @@ install_root_file \
 
 sudo ssh-keygen -A
 sudo /usr/sbin/sshd -t
+SSHD_INSTALLED_EFFECTIVE="$(
+    sudo /usr/sbin/sshd -T -C "$SSHD_CONNECTION_SPEC"
+)"
+validate_sshd_policy "$SSHD_INSTALLED_EFFECTIVE"
 
 if sudo launchctl print system/local.pf-tailscale-ssh >/dev/null 2>&1; then
     sudo launchctl bootout system/local.pf-tailscale-ssh
@@ -352,7 +354,23 @@ fi
 sudo launchctl bootstrap \
     system \
     /Library/LaunchDaemons/local.pf-tailscale-ssh.plist
-sudo /sbin/pfctl -a local.tailscale-ssh -sr >/dev/null
+
+PF_READY=0
+for _ in {1..20}; do
+    if sudo /sbin/pfctl -s info 2>/dev/null |
+        grep -Fq "Status: Enabled" &&
+        [[ -n "$(
+            sudo /sbin/pfctl \
+                -a com.apple/local.tailscale-ssh \
+                -sr 2>/dev/null
+        )" ]]; then
+        PF_READY=1
+        break
+    fi
+    sleep 0.25
+done
+[[ "$PF_READY" -eq 1 ]] ||
+    die "the PF service did not enable PF and load its scoped anchor"
 
 FIREWALL="/usr/libexec/ApplicationFirewall/socketfilterfw"
 sudo "$FIREWALL" --setglobalstate on

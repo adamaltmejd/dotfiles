@@ -7,12 +7,18 @@ IPv4 address and only from the enrolled phone's current Tailscale IPv4 address.
 Security layers:
 
 - exact source and destination filtering with macOS `pf`;
+- a persistent root service that owns a PF enable reference and loads only its
+  scoped `com.apple/local.tailscale-ssh` anchor;
 - Tailscale's encrypted device network and existing tailnet policy;
 - one permitted local user and one managed authorized key;
 - public-key authentication only;
 - no root login, forwarding, tunnelling, user RC, or X11 forwarding;
 - Apple's application firewall with stealth mode;
 - root-owned installed configuration, never symlinked from `~/.config`.
+
+The installer does not modify or reload `/etc/pf.conf`. It uses the
+`com.apple/*` anchor point already present in macOS's startup ruleset, avoiding
+the loss of dynamic rules maintained by system services.
 
 ## Enrol the phone
 
@@ -73,7 +79,7 @@ Expected checks:
    managed rules:
 
    ```bash
-   sudo pfctl -a local.tailscale-ssh -sr
+   sudo pfctl -a com.apple/local.tailscale-ssh -sr
    sudo sshd -T | grep -E '^(passwordauthentication|kbdinteractiveauthentication|authenticationmethods|permitrootlogin) '
    ```
 
@@ -98,5 +104,5 @@ All replaced files are copied beneath the setup run's timestamped
 configuration, turn off Remote Login in System Settings.
 
 Do not use `pfctl -d` as routine rollback: other macOS services may share PF.
-Restore the backed-up `/etc/pf.conf`, reload it, and boot out the managed
-LaunchDaemon instead.
+Boot out `system/local.pf-tailscale-ssh` to release this feature's enable
+reference. The service deliberately never reloads the complete PF ruleset.
