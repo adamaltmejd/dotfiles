@@ -83,8 +83,8 @@ symlinks root configuration into the user-writable dotfiles checkout. See
 
 Interactive SSH sessions on the Macs automatically create or attach to a
 persistent tmux session named `main`. The top status bar shows the Tailscale
-machine name prominently. Use the default `Ctrl-b d` binding to detach while
-leaving work running.
+machine name prominently. The command prefix is `§`: use `§ d` to detach while
+leaving work running, or press `§` twice to send a literal section sign.
 
 To request a one-off bare remote shell:
 
