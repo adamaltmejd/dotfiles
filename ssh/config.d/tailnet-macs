@@ -1,14 +1,18 @@
-# The shared config lists both paths; each Mac has only its own private key.
+# Shared destinations; Match blocks below select the key owned by this Mac.
 Host macbook macbook.boga-hadar.ts.net
     HostName 100.117.55.61
     User adam
-    IdentityFile ~/.ssh/id_tailnet_macbook
-    IdentityFile ~/.ssh/id_tailnet_macmini
     IdentitiesOnly yes
 
 Host macmini macmini.boga-hadar.ts.net
     HostName 100.102.117.11
     User adam
-    IdentityFile ~/.ssh/id_tailnet_macbook
-    IdentityFile ~/.ssh/id_tailnet_macmini
     IdentitiesOnly yes
+
+Match originalhost macbook,macmini,macbook.boga-hadar.ts.net,macmini.boga-hadar.ts.net exec "test -f ~/.ssh/id_tailnet_macbook"
+    IdentityFile ~/.ssh/id_tailnet_macbook
+
+Match originalhost macbook,macmini,macbook.boga-hadar.ts.net,macmini.boga-hadar.ts.net exec "test -f ~/.ssh/id_tailnet_macmini"
+    IdentityFile ~/.ssh/id_tailnet_macmini
+
+Match all
