@@ -1,0 +1,14 @@
+# The shared config lists both paths; each Mac has only its own private key.
+Host macbook adam-mbp-ifau.boga-hadar.ts.net
+    HostName adam-mbp-ifau.boga-hadar.ts.net
+    User adam
+    IdentityFile ~/.ssh/id_tailnet_macbook
+    IdentityFile ~/.ssh/id_tailnet_macmini
+    IdentitiesOnly yes
+
+Host macmini mac-mini-som-tillhr-adam.boga-hadar.ts.net
+    HostName mac-mini-som-tillhr-adam.boga-hadar.ts.net
+    User adam
+    IdentityFile ~/.ssh/id_tailnet_macbook
+    IdentityFile ~/.ssh/id_tailnet_macmini
+    IdentitiesOnly yes

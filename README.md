@@ -59,13 +59,12 @@ Override any feature with `--with-<feature>` or `--without-<feature>`.
 ### Tailscale-only inbound SSH
 
 The macOS `remote-ssh` feature installs a key-only OpenSSH configuration and
-restricts TCP/22 to one enrolled Tailscale client with `pf`. It is deliberately
-off by default because it enables a network service and requires a phone-bound
-public key.
+restricts TCP/22 to explicitly enrolled Tailscale clients with `pf`. It is
+deliberately off by default because it enables a network service.
 
-1. Export the phone's **public** SSH key to
-   `ssh/authorized_keys/iphone.pub`. Never add a private key to this repo.
-2. Confirm the phone's Tailscale DNS name in
+1. Put one distinct **public** key per enrolled device in
+   `ssh/authorized_keys/<device>.pub`. Never add a private key to this repo.
+2. Confirm each device's key name, Tailscale DNS name, and OS in
    `setup/macos/remote-ssh/config`.
 3. Preview and apply:
 
@@ -74,10 +73,10 @@ public key.
    ./setup/setup.sh --profile local --with-remote-ssh
    ```
 
-The installer discovers both devices' current Tailscale IPv4 addresses,
-validates the generated `sshd` and `pf` configurations, and then copies them
-to root-owned system paths. It never symlinks root configuration into the
-user-writable dotfiles checkout. See
+The installer discovers the devices' current Tailscale IPv4 addresses, excludes
+the server itself, binds each key to its source address, and validates the
+generated `sshd` and `pf` configurations before installing them. It never
+symlinks root configuration into the user-writable dotfiles checkout. See
 `setup/macos/remote-ssh/README.md` for verification and recovery.
 
 ### What setup touches

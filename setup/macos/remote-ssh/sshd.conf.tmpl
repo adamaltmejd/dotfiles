@@ -1,8 +1,8 @@
 # Managed by ~/.config/setup/macos/remote-ssh/install.sh
 # Root-owned installed copy; do not symlink this user-writable template.
 
-AllowUsers __REMOTE_USER__@__CLIENT_TAILSCALE_IPV4__/32
-AuthorizedKeysFile .ssh/authorized_keys.d/iphone
+AllowUsers __ALLOWED_USERS__
+AuthorizedKeysFile .ssh/authorized_keys.d/tailnet-clients
 
 AuthenticationMethods publickey
 PubkeyAuthentication yes

@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Preserve the installer's render directory for assertions. The test harness
+# removes its enclosing temporary directory with the real rm after each run.
+exit 0

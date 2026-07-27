@@ -1,8 +1,9 @@
 # Tailscale-only Remote SSH for macOS
 
-This opt-in dotfiles feature configures Apple's OpenSSH server for one enrolled
-iPhone. TCP/22 remains standard, but is reachable only at the Mac's Tailscale
-IPv4 address and only from the enrolled phone's current Tailscale IPv4 address.
+This opt-in dotfiles feature configures Apple's OpenSSH server for explicitly
+enrolled clients. TCP/22 remains standard, but is reachable only at the Mac's
+Tailscale IPv4 address and only from enrolled devices' current Tailscale IPv4
+addresses.
 
 Security layers:
 
@@ -10,7 +11,7 @@ Security layers:
 - a persistent root service that owns a PF enable reference and loads only its
   scoped `com.apple/local.tailscale-ssh` anchor;
 - Tailscale's encrypted device network and existing tailnet policy;
-- one permitted local user and one managed authorized key;
+- one permitted local user and source-bound managed authorized keys;
 - public-key authentication only;
 - no root login, forwarding, tunnelling, user RC, or X11 forwarding;
 - Apple's application firewall with stealth mode;
@@ -20,26 +21,54 @@ The installer does not modify or reload `/etc/pf.conf`. It uses the
 `com.apple/*` anchor point already present in macOS's startup ruleset, avoiding
 the loss of dynamic rules maintained by system services.
 
-## Enrol the phone
+## Enrol client keys
 
-Create a key used only for this access:
+Each device needs a distinct key used only for this access. A key is bound to
+the corresponding Tailscale source address when installed, and the installer
+rejects duplicate keys.
+
+For the iPhone:
 
 - Termius: prefer a device-bound Secure Enclave or FIDO2 key.
 - Echo: use a dedicated Ed25519 key, require Face ID for the key and app, and
   remember that Echo currently stores an importable private key in Keychain.
+- Export only its public key to `ssh/authorized_keys/iphone.pub`.
 
-Export only the public key:
+Create a different key on each Mac. Do not overwrite an existing key.
+
+On the MacBook:
 
 ```bash
-cp /path/to/exported-key.pub ~/.config/ssh/authorized_keys/iphone.pub
+ssh-keygen -t ed25519 -a 64 -f ~/.ssh/id_tailnet_macbook \
+  -C "macbook-tailnet-ssh"
+ssh-add --apple-use-keychain ~/.ssh/id_tailnet_macbook
 ```
 
-The file must contain exactly one public-key line. Never put a private key in
-the dotfiles repo.
+Copy only its public half into the tracked dotfiles:
 
-Confirm that `config` contains the phone's stable Tailscale DNS name. The
-installer resolves the current address from the signed-in Mac's live Tailscale
-network map, so no per-Mac or stale `100.x` address is committed.
+```bash
+cp ~/.ssh/id_tailnet_macbook.pub \
+  ~/.config/ssh/authorized_keys/macbook.pub
+```
+
+On the Mac mini:
+
+```bash
+ssh-keygen -t ed25519 -a 64 -f ~/.ssh/id_tailnet_macmini \
+  -C "macmini-tailnet-ssh"
+ssh-add --apple-use-keychain ~/.ssh/id_tailnet_macmini
+
+cp ~/.ssh/id_tailnet_macmini.pub \
+  ~/.config/ssh/authorized_keys/macmini.pub
+```
+
+Commit and sync each public key through the dotfiles repository. Never copy a
+Mac's private key to the other Mac, and never put a private key in this repo.
+All configured public keys must be present before the installer will run.
+
+Confirm that `config` contains every client's stable Tailscale DNS name and
+expected OS. The installer resolves current addresses from the signed-in Mac's
+live Tailscale network map, so no per-Mac or stale `100.x` address is committed.
 
 ## Preview and apply
 
@@ -63,15 +92,22 @@ only TCP/22.
 The installer prints the Mac's Ed25519 host-key fingerprint. Compare it with
 the phone client's first-connection prompt; never accept a different key.
 
-From the enrolled phone with Tailscale enabled:
+From an enrolled client with Tailscale enabled:
 
 ```text
 ssh adam@<printed-mac-tailscale-ip>
 ```
 
+The shared client configuration also provides:
+
+```bash
+ssh macbook
+ssh macmini
+```
+
 Expected checks:
 
-1. The enrolled key succeeds.
+1. The enrolled phone and peer Mac keys succeed.
 2. Password-only authentication reports `publickey`.
 3. Connecting to the Mac's Wi-Fi/LAN address fails.
 4. A different tailnet device cannot reach port 22.
@@ -89,13 +125,16 @@ another client with host-key verification is preferred for this configuration.
 
 ## Update or revoke
 
-To rotate the phone key, replace `ssh/authorized_keys/iphone.pub`, commit it,
-and rerun the feature. To revoke the phone immediately, turn off Remote Login
-locally and remove the phone from the Tailscale admin console.
+To rotate a client key, replace its public-key file, commit it, and rerun the
+feature on both Macs. To revoke the phone, remove its record from `config` and
+rerun on both servers. Removing a Mac record also decommissions that Mac as a
+managed server; rerun only on the remaining Mac. For immediate phone
+revocation, turn off Remote Login locally and remove the phone from the
+Tailscale admin console.
 
-If the phone is re-enrolled under a different Tailscale DNS name, update
-`config` and rerun. The old address remains installed until a successful
-rerun, so do this while physically at the Mac.
+If a device is re-enrolled under a different Tailscale DNS name, update `config`
+and rerun. The old address remains installed until a successful rerun, so do
+this while physically at the Mac.
 
 ## Recovery
 

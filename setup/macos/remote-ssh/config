@@ -1,3 +1,10 @@
-# Stable Tailscale DNS identity of the only client allowed to reach SSH.
-# The installer resolves its current 100.x address from `tailscale status`.
-REMOTE_SSH_CLIENT_DNS_NAME="iphone-15-pro.boga-hadar.ts.net."
+# Stable Tailscale identities allowed to reach SSH. Each record is:
+#   public-key name | Tailscale DNS name | expected Tailscale OS
+#
+# The installer resolves current 100.x addresses from `tailscale status`,
+# excludes the server itself, and binds every key to its device's source IP.
+REMOTE_SSH_CLIENTS=(
+    "iphone|iphone-15-pro.boga-hadar.ts.net.|iOS"
+    "macbook|adam-mbp-ifau.boga-hadar.ts.net.|macOS"
+    "macmini|mac-mini-som-tillhr-adam.boga-hadar.ts.net.|macOS"
+)

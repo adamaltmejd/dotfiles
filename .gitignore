@@ -19,6 +19,8 @@
 # SSH configuration
 !ssh/
 !ssh/**
+# Private client keys belong only in ~/.ssh, never in this repository.
+ssh/id_*
 
 # R configuration (explicit files only; XDG-aware packages write here too)
 !r/

@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+[[ "$#" -eq 2 && "$1" == "status" && "$2" == "--json" ]] ||
+    exit 64
+[[ -n "${REMOTE_SSH_TEST_STATUS:-}" ]] || exit 64
+
+exec /bin/cat "$REMOTE_SSH_TEST_STATUS"
