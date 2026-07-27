@@ -51,9 +51,34 @@ Setup writes a minimal `~/.zshenv` that sets XDG variables and points `ZDOTDIR` 
 | direnv | yes | no |
 | R dotfiles | yes | no |
 | Claude/Codex config | yes | no |
+| Tailscale-only inbound SSH | opt-in | no |
 | Python/pip shims (enforce uv) | yes | no |
 
 Override any feature with `--with-<feature>` or `--without-<feature>`.
+
+### Tailscale-only inbound SSH
+
+The macOS `remote-ssh` feature installs a key-only OpenSSH configuration and
+restricts TCP/22 to one enrolled Tailscale client with `pf`. It is deliberately
+off by default because it enables a network service and requires a phone-bound
+public key.
+
+1. Export the phone's **public** SSH key to
+   `ssh/authorized_keys/iphone.pub`. Never add a private key to this repo.
+2. Confirm the phone's Tailscale DNS name in
+   `setup/macos/remote-ssh/config`.
+3. Preview and apply:
+
+   ```bash
+   ./setup/setup.sh --profile local --with-remote-ssh --dry-run
+   ./setup/setup.sh --profile local --with-remote-ssh
+   ```
+
+The installer discovers both devices' current Tailscale IPv4 addresses,
+validates the generated `sshd` and `pf` configurations, and then copies them
+to root-owned system paths. It never symlinks root configuration into the
+user-writable dotfiles checkout. See
+`setup/macos/remote-ssh/README.md` for verification and recovery.
 
 ### What setup touches
 
