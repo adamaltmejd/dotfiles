@@ -5,6 +5,6 @@
 # excludes the server itself, and binds every key to its device's source IP.
 REMOTE_SSH_CLIENTS=(
     "iphone|iphone-15-pro.boga-hadar.ts.net.|iOS"
-    "macbook|adam-mbp-ifau.boga-hadar.ts.net.|macOS"
-    "macmini|mac-mini-som-tillhr-adam.boga-hadar.ts.net.|macOS"
+    "macbook|macbook.boga-hadar.ts.net.|macOS"
+    "macmini|macmini.boga-hadar.ts.net.|macOS"
 )

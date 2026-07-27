@@ -86,3 +86,15 @@ fi
 _host_local="${XDG_CONFIG_HOME:-$HOME/.config}/zsh/local.zsh"
 [[ -r "$_host_local" ]] && source "$_host_local"
 unset _host_local
+
+# Interactive SSH sessions on the two Macs share one persistent tmux session.
+# Set DOTFILES_NO_AUTO_TMUX=1 in zsh/local.zsh for a host-local escape hatch.
+if [[ "$OSTYPE" == darwin* &&
+    -n "$SSH_CONNECTION" &&
+    -n "$SSH_TTY" &&
+    -z "$TMUX" &&
+    "$TERM" != dumb &&
+    "${DOTFILES_NO_AUTO_TMUX:-0}" != 1 ]] &&
+    (( $+commands[tmux] )); then
+    exec tmux new-session -A -s main
+fi

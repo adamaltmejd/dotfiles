@@ -79,6 +79,19 @@ generated `sshd` and `pf` configurations before installing them. It never
 symlinks root configuration into the user-writable dotfiles checkout. See
 `setup/macos/remote-ssh/README.md` for verification and recovery.
 
+### Remote tmux
+
+Interactive SSH sessions on the Macs automatically create or attach to a
+persistent tmux session named `main`. The top status bar shows the Tailscale
+machine name prominently. Use the default `Ctrl-b d` binding to detach while
+leaving work running.
+
+To request a one-off bare remote shell:
+
+```bash
+ssh -t macmini 'DOTFILES_NO_AUTO_TMUX=1 exec zsh -il'
+```
+
 ### What setup touches
 
 | Target | Action |
@@ -136,6 +149,7 @@ dotfiles/
 ├── ssh/                    # ssh config + config.d/ for hosts
 ├── r/                      # Rprofile, Renviron, Makevars, lintr
 ├── radian/                 # radian console config
+├── tmux/                   # auto-attached macOS SSH session + host status
 ├── zellij/                 # zellij multiplexer config (server use)
 ├── agents/                 # AI agent configs + shared skills
 │   ├── claude/             # Claude Code settings

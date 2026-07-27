@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+tailscale_bin=""
+if command -v tailscale >/dev/null 2>&1; then
+    tailscale_bin="$(command -v tailscale)"
+elif [[ -x /usr/local/bin/tailscale ]]; then
+    tailscale_bin="/usr/local/bin/tailscale"
+fi
+
+if [[ -n "$tailscale_bin" ]] && command -v jq >/dev/null 2>&1; then
+    status_json="$("$tailscale_bin" status --json 2>/dev/null || true)"
+    label="$(
+        jq -r '.Self.DNSName // "" | split(".")[0]' \
+            <<<"$status_json" 2>/dev/null || true
+    )"
+    if [[ "$label" =~ ^[A-Za-z0-9-]+$ ]]; then
+        printf '%s' "$label" | tr '[:lower:]' '[:upper:]'
+        exit 0
+    fi
+fi
+
+macbook_key="$HOME/.ssh/id_tailnet_macbook"
+macmini_key="$HOME/.ssh/id_tailnet_macmini"
+if [[ -f "$macbook_key" && ! -f "$macmini_key" ]]; then
+    printf 'MACBOOK'
+elif [[ -f "$macmini_key" && ! -f "$macbook_key" ]]; then
+    printf 'MACMINI'
+elif [[ -f "$macbook_key" && -f "$macmini_key" ]]; then
+    printf 'AMBIGUOUS-MAC'
+elif [[ "$(uname -s)" == "Darwin" ]]; then
+    scutil --get LocalHostName 2>/dev/null || hostname -s
+else
+    hostname -s
+fi
