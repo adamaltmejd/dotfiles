@@ -2,9 +2,8 @@
 auto-update-channel = tip
 
 shell-integration = zsh
-# `true` enables ssh-env, which re-forwards the Mac's en_US.UTF-8 locale into
-# remote sessions and overrides ssh-config SetEnv — breaks locale on C-only
-# hosts (homelab is C.UTF-8). no-ssh-env keeps everything else (incl. ssh-terminfo).
-shell-integration-features = no-ssh-env
+# Keep locale forwarding disabled for C-only homelab hosts, but let Ghostty
+# install its terminal definition automatically before interactive SSH.
+shell-integration-features = no-ssh-env,ssh-terminfo
 
 theme = Gruvbox Dark Hard
