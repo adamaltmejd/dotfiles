@@ -1,0 +1,24 @@
+# Managed by ~/.config/setup/macos/remote-ssh/install.sh
+# Root-owned installed copy; do not symlink this user-writable template.
+
+AllowUsers __REMOTE_USER__@__CLIENT_TAILSCALE_IPV4__/32
+AuthorizedKeysFile .ssh/authorized_keys.d/iphone
+
+AuthenticationMethods publickey
+PubkeyAuthentication yes
+PasswordAuthentication no
+KbdInteractiveAuthentication no
+PermitEmptyPasswords no
+PermitRootLogin no
+
+MaxAuthTries 3
+LoginGraceTime 30
+MaxSessions 2
+LogLevel VERBOSE
+
+AllowAgentForwarding no
+AllowTcpForwarding no
+X11Forwarding no
+GatewayPorts no
+PermitTunnel no
+PermitUserRC no

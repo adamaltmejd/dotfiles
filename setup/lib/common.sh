@@ -90,9 +90,11 @@ build_profile_content() {
     local feat_smartcli_local=1 feat_smartcli_server=0
     local feat_r_local=1       feat_r_server=0
     local feat_claude_local=1  feat_claude_server=0
+    local feat_remote_ssh_local=0 feat_remote_ssh_server=0
 
     # Select defaults for profile
     local feat_starship feat_direnv feat_smartcli feat_r feat_claude
+    local feat_remote_ssh
     case "$profile" in
         local)
             feat_starship=$feat_starship_local
@@ -100,6 +102,7 @@ build_profile_content() {
             feat_smartcli=$feat_smartcli_local
             feat_r=$feat_r_local
             feat_claude=$feat_claude_local
+            feat_remote_ssh=$feat_remote_ssh_local
             ;;
         server)
             feat_starship=$feat_starship_server
@@ -107,6 +110,7 @@ build_profile_content() {
             feat_smartcli=$feat_smartcli_server
             feat_r=$feat_r_server
             feat_claude=$feat_claude_server
+            feat_remote_ssh=$feat_remote_ssh_server
             ;;
         *)
             die "Unknown profile '$profile' in build_profile_content"
@@ -124,6 +128,7 @@ build_profile_content() {
             SMARTCLI) feat_smartcli="$val" ;;
             R)        feat_r="$val" ;;
             CLAUDE)   feat_claude="$val" ;;
+            REMOTE_SSH) feat_remote_ssh="$val" ;;
             *)        die "Unknown feature override: $key" ;;
         esac
     done
@@ -136,5 +141,6 @@ DOTFILES_FEAT_DIRENV=$feat_direnv
 DOTFILES_FEAT_SMARTCLI=$feat_smartcli
 DOTFILES_FEAT_R=$feat_r
 DOTFILES_FEAT_CLAUDE=$feat_claude
+DOTFILES_FEAT_REMOTE_SSH=$feat_remote_ssh
 EOF
 }

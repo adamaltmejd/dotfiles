@@ -24,7 +24,8 @@ Options:
   -y, --yes             Skip confirmation prompt
   --xdg-config-home <path>
                         Set default XDG_CONFIG_HOME written to ~/.zshenv (default: ~/.config)
-  --with-<feature>      Enable a feature (starship, direnv, smartcli, r, claude)
+  --with-<feature>      Enable a feature (starship, direnv, smartcli, r, claude,
+                        remote-ssh)
   --without-<feature>   Disable a feature
   --skip-packages       Skip package installation phase
   --no-sudo             Never use sudo for package operations
@@ -70,12 +71,14 @@ while [[ $# -gt 0 ]]; do
             ;;
         --with-*)
             _feat="${1#--with-}"
+            _feat="${_feat//-/_}"
             FEATURE_OVERRIDES+=("${_feat^^}=1")
             unset _feat
             shift
             ;;
         --without-*)
             _feat="${1#--without-}"
+            _feat="${_feat//-/_}"
             FEATURE_OVERRIDES+=("${_feat^^}=0")
             unset _feat
             shift
@@ -142,7 +145,7 @@ log_info "  xdg config   : $XDG_CONFIG_HOME_VALUE"
 log_info "  os           : $OS_ID"
 log_info "  pkg manager  : ${PKG_MANAGER:-none}"
 log_info "  sudo         : $SUDO_OK"
-log_info "  features     : starship=$DOTFILES_FEAT_STARSHIP direnv=$DOTFILES_FEAT_DIRENV smartcli=$DOTFILES_FEAT_SMARTCLI r=$DOTFILES_FEAT_R claude=$DOTFILES_FEAT_CLAUDE"
+log_info "  features     : starship=$DOTFILES_FEAT_STARSHIP direnv=$DOTFILES_FEAT_DIRENV smartcli=$DOTFILES_FEAT_SMARTCLI r=$DOTFILES_FEAT_R claude=$DOTFILES_FEAT_CLAUDE remote-ssh=$DOTFILES_FEAT_REMOTE_SSH"
 log_info "  backup dir   : $BACKUP_DIR"
 
 if [[ "$APPLY" -eq 0 ]]; then
@@ -273,6 +276,24 @@ else
 fi
 
 phase "Post-setup"
+
+if [[ "$DOTFILES_FEAT_REMOTE_SSH" -eq 1 ]]; then
+    if [[ "$OS_ID" != "darwin" || "$PROFILE" != "local" ]]; then
+        die "remote-ssh is supported only by the macOS local profile"
+    fi
+    if [[ "$SUDO_OK" == "disabled" || "$SUDO_OK" == "unavailable" ]]; then
+        die "remote-ssh needs sudo; remove --no-sudo and try again"
+    fi
+
+    _remote_ssh_args=("--backup-dir" "$BACKUP_DIR")
+    if [[ "$APPLY" -eq 1 ]]; then
+        _remote_ssh_args+=("--apply")
+    else
+        _remote_ssh_args+=("--dry-run")
+    fi
+    "$DOTFILES_DIR/setup/macos/remote-ssh/install.sh" "${_remote_ssh_args[@]}"
+    unset _remote_ssh_args
+fi
 
 # Convert dotfiles remote to SSH if currently HTTPS
 if command -v git >/dev/null 2>&1 && git -C "$DOTFILES_DIR" rev-parse --is-inside-work-tree >/dev/null 2>&1; then

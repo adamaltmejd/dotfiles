@@ -1,0 +1,11 @@
+# Managed by ~/.config/setup/macos/remote-ssh/install.sh
+
+client = "__CLIENT_TAILSCALE_IPV4__"
+server = "__SERVER_TAILSCALE_IPV4__"
+
+# Permit local diagnostics and the enrolled phone over Tailscale.
+pass in quick on lo0 proto tcp to any port 22 keep state
+pass in quick inet proto tcp from $client to $server port 22 flags S/SA keep state
+
+# Reject SSH to LAN addresses, public IPv6 addresses, and every other source.
+block drop in quick proto tcp to any port 22

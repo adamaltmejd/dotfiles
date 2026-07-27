@@ -1,0 +1,7 @@
+# Replace this file with iphone.pub containing one public SSH key.
+#
+# Echo: use a dedicated Ed25519 key for this Mac.
+# Termius: prefer a device-bound Secure Enclave/FIDO2 key.
+#
+# Example:
+# ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAA... adam-iphone
