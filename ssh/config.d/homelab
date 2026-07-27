@@ -1,24 +1,98 @@
-# Bare short names → FQDN (e.g. `ssh pve-sthlm` → pve-sthlm.home.altmejd.se).
-# Canonicalization re-matches every Host block below against the FQDN, so
-# `User`, `IdentityFile`, etc. apply correctly. The FQDN resolves via the
-# Tailscale split-DNS rule for home.altmejd.se → AdGuard → LAN IP, so on-LAN
-# traffic stays on LAN and off-LAN traffic uses the Tailscale subnet routers.
-# `sure` is the one LXC without a -sthlm/-breven suffix (cross-site singleton,
-# by design), so it's listed explicitly to get canonicalized like the rest.
-Host *-sthlm *-breven sure
-    CanonicalizeHostname yes
-    CanonicalDomains home.altmejd.se
-    CanonicalizeMaxDots 0
+# Short legacy names and old flat FQDNs map to canonical site-subdomain names.
+# The parent home.altmejd.se Tailscale split-DNS route is intentionally absent;
+# off-LAN SSH must use *.sthlm.home.altmejd.se / *.breven.home.altmejd.se.
+Host adguard-sthlm adguard-sthlm.home.altmejd.se
+    HostName adguard.sthlm.home.altmejd.se
+
+Host adguard2-sthlm adguard2-sthlm.home.altmejd.se
+    HostName adguard2.sthlm.home.altmejd.se
+
+Host certbot-sthlm certbot-sthlm.home.altmejd.se
+    HostName certbot.sthlm.home.altmejd.se
+
+Host ha-sthlm ha-sthlm.home.altmejd.se
+    HostName ha.sthlm.home.altmejd.se
+
+Host hermes-sthlm hermes-sthlm.home.altmejd.se
+    HostName hermes.sthlm.home.altmejd.se
+
+Host logging-sthlm logging-sthlm.home.altmejd.se
+    HostName logging.sthlm.home.altmejd.se
+
+Host media-sthlm media-sthlm.home.altmejd.se
+    HostName media.sthlm.home.altmejd.se
+
+Host mqtt-sthlm mqtt-sthlm.home.altmejd.se
+    HostName mqtt.sthlm.home.altmejd.se
+
+Host n8n-sthlm n8n-sthlm.home.altmejd.se
+    HostName n8n.sthlm.home.altmejd.se
+
+Host pbs-sthlm pbs-sthlm.home.altmejd.se
+    HostName pbs.sthlm.home.altmejd.se
+
+Host recorder-sthlm recorder-sthlm.home.altmejd.se
+    HostName recorder.sthlm.home.altmejd.se
+
+Host sure sure.home.altmejd.se
+    HostName sure.sthlm.home.altmejd.se
+
+Host uptime-sthlm uptime-sthlm.home.altmejd.se
+    HostName uptime.sthlm.home.altmejd.se
+
+Host zigbee2mqtt-sthlm zigbee2mqtt-sthlm.home.altmejd.se
+    HostName zigbee2mqtt.sthlm.home.altmejd.se
+
+Host adguard-breven adguard-breven.home.altmejd.se
+    HostName adguard.breven.home.altmejd.se
+
+Host ha-breven ha-breven.home.altmejd.se
+    HostName ha.breven.home.altmejd.se
+
+Host logging-breven logging-breven.home.altmejd.se
+    HostName logging.breven.home.altmejd.se
+
+Host matter-breven matter-breven.home.altmejd.se
+    HostName matter.breven.home.altmejd.se
+
+Host mqtt-breven mqtt-breven.home.altmejd.se
+    HostName mqtt.breven.home.altmejd.se
+
+Host pbs-breven pbs-breven.home.altmejd.se
+    HostName pbs.breven.home.altmejd.se
+
+Host recorder-breven recorder-breven.home.altmejd.se
+    HostName recorder.breven.home.altmejd.se
+
+Host uptime-breven uptime-breven.home.altmejd.se
+    HostName uptime.breven.home.altmejd.se
+
+Host watermeter-breven watermeter-breven.home.altmejd.se
+    HostName watermeter.breven.home.altmejd.se
+
+Host zigbee2mqtt-breven zigbee2mqtt-breven.home.altmejd.se
+    HostName zigbee2mqtt.breven.home.altmejd.se
 
 # PVE nodes — interactive login as root (password), Ansible as ansible (key)
-Host pve-sthlm.home.altmejd.se pve1-breven.home.altmejd.se pve2-sthlm.home.altmejd.se 10.0.50.2 10.1.50.2 10.0.50.5
+Host pve-sthlm pve-sthlm.home.altmejd.se pve1-sthlm pve1-sthlm.home.altmejd.se pve1.sthlm.home.altmejd.se 10.0.50.2
+    HostName pve1.sthlm.home.altmejd.se
+    PasswordAuthentication yes
+    SetEnv LANG=C.UTF-8 LC_ALL=C.UTF-8
+
+Host pve2-sthlm pve2-sthlm.home.altmejd.se pve2.sthlm.home.altmejd.se 10.0.50.5
+    HostName pve2.sthlm.home.altmejd.se
+    PasswordAuthentication yes
+    SetEnv LANG=C.UTF-8 LC_ALL=C.UTF-8
+
+Host pve1-breven pve1-breven.home.altmejd.se pve1.breven.home.altmejd.se 10.1.50.2
+    HostName pve1.breven.home.altmejd.se
     PasswordAuthentication yes
     SetEnv LANG=C.UTF-8 LC_ALL=C.UTF-8
 
 # Common settings for all homelab hosts. `User root` is the LXC default;
 # the PVE and VM blocks above override it via first-match-wins.
-# Also defaults all Tailscale devices to these settings.
-Host *.home.altmejd.se 10.?.40.* 10.?.50.* 100.*
+# Also defaults direct 100.x device access to these settings.
+Host adguard-sthlm adguard2-sthlm certbot-sthlm ha-sthlm hermes-sthlm logging-sthlm media-sthlm mqtt-sthlm n8n-sthlm pbs-sthlm recorder-sthlm sure uptime-sthlm zigbee2mqtt-sthlm adguard-breven ha-breven logging-breven matter-breven mqtt-breven pbs-breven recorder-breven uptime-breven watermeter-breven zigbee2mqtt-breven pve-sthlm pve1-sthlm pve2-sthlm pve1-breven *.home.altmejd.se 10.?.40.* 10.?.50.* 100.*
     User root
     Port 22
     IdentityFile ~/.ssh/id_home
