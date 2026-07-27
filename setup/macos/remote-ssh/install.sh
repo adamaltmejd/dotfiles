@@ -381,9 +381,24 @@ sudo "$FIREWALL" --setstealthmode on
 sudo "$FIREWALL" --add /usr/libexec/sshd-keygen-wrapper >/dev/null
 sudo "$FIREWALL" --unblockapp /usr/libexec/sshd-keygen-wrapper >/dev/null
 
-if ! REMOTE_LOGIN_OUTPUT="$(sudo /usr/sbin/systemsetup -setremotelogin on 2>&1)"; then
-    warn "$REMOTE_LOGIN_OUTPUT"
+if ! REMOTE_LOGIN_SET_OUTPUT="$(
+    sudo /usr/sbin/systemsetup -setremotelogin on 2>&1
+)"; then
+    warn "$REMOTE_LOGIN_SET_OUTPUT"
     die "configuration is installed safely, but Remote Login could not be enabled; grant Terminal Full Disk Access and rerun"
+fi
+
+if ! REMOTE_LOGIN_STATE_OUTPUT="$(
+    sudo /usr/sbin/systemsetup -getremotelogin 2>&1
+)"; then
+    warn "$REMOTE_LOGIN_STATE_OUTPUT"
+    die "configuration is installed safely, but Remote Login state could not be verified"
+fi
+
+if ! grep -Fqx "Remote Login: On" <<<"$REMOTE_LOGIN_STATE_OUTPUT"; then
+    warn "systemsetup -setremotelogin output: ${REMOTE_LOGIN_SET_OUTPUT:-<none>}"
+    warn "systemsetup -getremotelogin output: ${REMOTE_LOGIN_STATE_OUTPUT:-<none>}"
+    die "configuration is installed safely, but Remote Login is not enabled; grant Terminal Full Disk Access and rerun"
 fi
 
 log "Remote Login enabled for $REMOTE_USER from $CLIENT_TAILSCALE_IPV4 only"
