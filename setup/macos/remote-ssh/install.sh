@@ -348,8 +348,20 @@ SSHD_INSTALLED_EFFECTIVE="$(
 )"
 validate_sshd_policy "$SSHD_INSTALLED_EFFECTIVE"
 
-if sudo launchctl print system/local.pf-tailscale-ssh >/dev/null 2>&1; then
-    sudo launchctl bootout system/local.pf-tailscale-ssh
+PF_SERVICE_LABEL="system/local.pf-tailscale-ssh"
+if sudo launchctl print "$PF_SERVICE_LABEL" >/dev/null 2>&1; then
+    sudo launchctl bootout "$PF_SERVICE_LABEL"
+
+    PF_UNLOADED=0
+    for _ in {1..20}; do
+        if ! sudo launchctl print "$PF_SERVICE_LABEL" >/dev/null 2>&1; then
+            PF_UNLOADED=1
+            break
+        fi
+        sleep 0.25
+    done
+    [[ "$PF_UNLOADED" -eq 1 ]] ||
+        die "the previous PF service instance did not finish unloading"
 fi
 sudo launchctl bootstrap \
     system \
