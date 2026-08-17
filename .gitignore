@@ -45,14 +45,21 @@ ssh/id_*
 !ghostty/
 !ghostty/**
 
+# Zed (XDG-native, no symlink needed). settings.json only — prompts/ is a binary
+# LMDB store and themes/ is populated by the editor.
+!zed/
+zed/*
+!zed/settings.json
+
 # AI agents (Claude Code, Codex CLI, shared skills)
 !agents/
 !agents/**
+# Project-scoped Claude Code config for this repo. Track settings.json only:
+# everything else here is runtime state (settings.local.json, worktrees/, locks)
+# that Claude Code rewrites.
 !.claude/
-!.claude/**
-.claude/scheduled_tasks.lock
-.claude/worktrees/
-.claude/settings.local.json
+.claude/*
+!.claude/settings.json
 # Codex owns and rewrites config.toml at runtime (trust levels, marketplaces,
 # desktop/tui state, machine paths) — untracked to avoid churn. See setup.sh.
 agents/codex/config.toml
@@ -91,6 +98,7 @@ git/config.local
 git/config.macos
 gh/hosts.yml
 r/fixest/
+r/marginaleffects/
 r/modelsummary/
 
 # Common junk
@@ -111,3 +119,8 @@ cagent
 .wrangler
 homebrew
 opentofu
+# entire.io CLI state; the credential itself lives in the macOS keychain
+entire
+# switchyard daemon state. operator.env holds a plaintext OAuth token at mode
+# 0600 by the daemon's design — never allowlist this directory.
+switchyard
