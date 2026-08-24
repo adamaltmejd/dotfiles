@@ -119,8 +119,6 @@ cagent
 .wrangler
 homebrew
 opentofu
-# entire.io CLI state; the credential itself lives in the macOS keychain
-entire
 # switchyard daemon state. operator.env holds a plaintext OAuth token at mode
 # 0600 by the daemon's design — never allowlist this directory.
 switchyard
