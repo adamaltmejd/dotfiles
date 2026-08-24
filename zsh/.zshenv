@@ -20,11 +20,17 @@ if [[ -x /opt/homebrew/bin/brew ]]; then
   eval "$(/opt/homebrew/bin/brew shellenv)"
 fi
 
+# Bun resolves its global install root from XDG_CACHE_HOME when BUN_INSTALL is
+# unset, which lands `bun install -g` binaries in a disposable cache directory.
+# Pin installs to the data dir and keep only the package cache under cache.
+export BUN_INSTALL="$XDG_DATA_HOME/bun"
+export BUN_INSTALL_CACHE_DIR="$XDG_CACHE_HOME/bun"
+
 # Additional paths
 typeset -U path PATH
 path=(
   "$HOME/.local/bin"
-  "$HOME/.bun/bin"
+  "$BUN_INSTALL/bin"
   $path
 )
 [[ "$OSTYPE" == darwin* ]] && path+=("/Applications/Obsidian.app/Contents/MacOS")
