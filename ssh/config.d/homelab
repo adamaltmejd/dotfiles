@@ -40,6 +40,12 @@ Host sure sure.home.altmejd.se
 Host uptime-sthlm uptime-sthlm.home.altmejd.se
     HostName uptime.sthlm.home.altmejd.se
 
+Host yard-sthlm yard-sthlm.home.altmejd.se
+    HostName yard.sthlm.home.altmejd.se
+    # Operator sessions land as yard (auto-attaches the operator tmux);
+    # root stays available for platform admin via `ssh root@yard-sthlm`.
+    User yard
+
 Host zigbee2mqtt-sthlm zigbee2mqtt-sthlm.home.altmejd.se
     HostName zigbee2mqtt.sthlm.home.altmejd.se
 
@@ -92,7 +98,7 @@ Host pve1-breven pve1-breven.home.altmejd.se pve1.breven.home.altmejd.se 10.1.50
 # Common settings for all homelab hosts. `User root` is the LXC default;
 # the PVE and VM blocks above override it via first-match-wins.
 # Also defaults direct 100.x device access to these settings.
-Host adguard-sthlm adguard2-sthlm certbot-sthlm ha-sthlm hermes-sthlm logging-sthlm media-sthlm mqtt-sthlm n8n-sthlm pbs-sthlm recorder-sthlm sure uptime-sthlm zigbee2mqtt-sthlm adguard-breven ha-breven logging-breven matter-breven mqtt-breven pbs-breven recorder-breven uptime-breven watermeter-breven zigbee2mqtt-breven pve-sthlm pve1-sthlm pve2-sthlm pve1-breven *.home.altmejd.se 10.?.40.* 10.?.50.* 100.*
+Host adguard-sthlm adguard2-sthlm certbot-sthlm ha-sthlm hermes-sthlm logging-sthlm media-sthlm mqtt-sthlm n8n-sthlm pbs-sthlm recorder-sthlm sure uptime-sthlm yard-sthlm zigbee2mqtt-sthlm adguard-breven ha-breven logging-breven matter-breven mqtt-breven pbs-breven recorder-breven uptime-breven watermeter-breven zigbee2mqtt-breven pve-sthlm pve1-sthlm pve2-sthlm pve1-breven *.home.altmejd.se 10.?.40.* 10.?.50.* 100.*
     User root
     Port 22
     IdentityFile ~/.ssh/id_home
