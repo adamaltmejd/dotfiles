@@ -63,8 +63,9 @@ zed/*
 # Codex owns and rewrites config.toml at runtime (trust levels, marketplaces,
 # desktop/tui state, machine paths) — untracked to avoid churn. See setup.sh.
 agents/codex/config.toml
-# agents/skills/ is allowlisted: installed marketplace skills (large, churn on
-# update) are ignored; curated skills are re-allowed explicitly below.
+# agents/skills/ is allowlisted: externally installed skills are ignored
+# whatever their size or install method (marketplace, npx) since they churn on
+# update and are refetchable; locally authored ones are re-allowed below.
 agents/skills/*
 !agents/skills/web-design-reviewer/
 !agents/skills/web-design-reviewer/**
