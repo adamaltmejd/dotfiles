@@ -1,5 +1,4 @@
-# Pre-rellease builds for claude memory leak fix
-auto-update-channel = tip
+auto-update-channel = stable
 
 shell-integration = zsh
 # Keep locale forwarding disabled for C-only homelab hosts, but let Ghostty
