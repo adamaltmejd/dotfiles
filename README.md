@@ -142,6 +142,7 @@ dotfiles/
 │   ├── setup.sh            # main setup script
 │   ├── lib/                # detection, linking, package helpers
 │   ├── macos-defaults.zsh  # macOS system defaults
+│   ├── macos/              # remote-ssh (Tailscale-only sshd) installer + tests
 │   └── packages/           # package manifests (shared, local, server, Brewfile)
 ├── zsh/                    # ZDOTDIR — .zshrc, .zshenv, conf.d/
 ├── direnv/                 # direnvrc with use_op helper
@@ -157,7 +158,9 @@ dotfiles/
 │   └── skills/             # shared skills (symlinked to ~/.claude/skills)
 ├── ansible/                # ansible config
 ├── gh/                     # GitHub CLI config
-└── ghostty/                # ghostty terminal config
+├── ghostty/                # ghostty terminal config
+├── zed/                    # Zed editor settings.json
+└── uv/                     # uv.toml (7-day minimum release age)
 ```
 
 ## License
