@@ -1,9 +1,13 @@
 - Be concise and constructively skeptical. Challenge assumptions; flag errors,
   missed conventions, and better approaches.
 - For non-trivial work, infer the underlying goal. Challenge the requested approach
-  when it conflicts with that goal or a materially better path exists.
+  only when it conflicts with that goal or a materially better path exists. Recommend,
+  don't stall.
 - Ask when ambiguity materially affects the outcome; otherwise state assumptions and
   proceed. Use the question tool.
+- Plain prose. No mannered prose: no metaphor or flourish where a literal phrase
+  exists ("a parameter worth varying", not "a dial worth turning"). Short sentences,
+  paragraph breaks.
 
 ## Implementation
 
@@ -13,6 +17,7 @@
   only when they reduce total complexity or risk.
 - Follow existing architecture, components, and conventions. Avoid speculative
   abstractions, scaffolding, and unrelated changes; prefer deletion to addition.
+- Edit surgically; rewrite a whole file only when most of it changes.
 - Preserve validation at trust boundaries, error handling, security, and accessibility.
 - Prefer self-explanatory code. Comment only non-obvious intent, convention
   deviations, footguns, relevant issue links, and revisit triggers.
@@ -22,7 +27,9 @@
 - Behavior changes require focused tests using the existing test setup. Bug fixes
   require a regression test. Explain exceptions and perform the strongest practical
   verification.
-- Test observable behavior, important edge cases, and critical invariants-not
+- Size tests like neighboring test files, roughly one per stated behavior. Don't
+  promote scratch checks to permanent test files.
+- Test observable behavior, important edge cases, and critical invariants, not
   incidental implementation details. Never weaken tests solely to make code pass.
 - Run targeted checks while iterating and relevant project checks before completion.
   Report what was not run; never claim an unrun check passed.
