@@ -1,7 +1,7 @@
 {
   "BackendState": "Running",
   "Self": {
-    "DNSName": "adam-mbp-ifau.boga-hadar.ts.net.",
+    "DNSName": "macbook.boga-hadar.ts.net.",
     "HostName": "macbook",
     "OS": "macOS",
     "TailscaleIPs": [
@@ -16,7 +16,7 @@
       "TailscaleIPs": ["100.124.94.54"]
     },
     "macmini": {
-      "DNSName": "mac-mini-som-tillhr-adam.boga-hadar.ts.net.",
+      "DNSName": "macmini.boga-hadar.ts.net.",
       "OS": "macOS",
       "TailscaleIPs": ["100.102.117.11"]
     }
