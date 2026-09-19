@@ -112,6 +112,21 @@ r/modelsummary/
 # Ignore local/sensitive files
 *.local
 
+# Agentbox (containerised coding agent). Only config is tracked: vendor/
+# holds ~100 MB of pinned binaries (rebuild with `agentbox vendor`) and pi
+# writes sessions/, cache/ and logs/ into agentbox/pi/ at runtime.
+!agentbox/
+!agentbox/README.md
+!agentbox/Containerfile
+!agentbox/agentbox.sh
+!agentbox/vendor.lock
+!agentbox/proxy/
+!agentbox/proxy/allowlist.txt
+!agentbox/proxy/squid.conf.in
+!agentbox/pi/
+!agentbox/pi/AGENTS.md
+!agentbox/pi/models.json
+
 # == Explicit ignores ==
 op
 mole

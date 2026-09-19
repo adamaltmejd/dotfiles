@@ -43,6 +43,11 @@ brew "openssl"
 brew "mbedtls"
 brew "zstd"
 
+# Sandboxed coding agent (agentbox/): Apple's container runtime plus the
+# host-side egress proxy that enforces its allowlist.
+brew "container"
+brew "squid"
+
 # Casks
 cask "1password-cli"
 cask "1password"

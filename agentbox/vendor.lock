@@ -1,0 +1,13 @@
+# Pinned build artifacts for the agentbox image.
+# Format: <sha256>  <local name>  <url>
+# Verified on 2026-09-19. uv and rtk hashes were checked against checksum
+# files published alongside their releases, and ponytail's against the npm
+# registry shasum; the others are pinned on first fetch.
+# Bump a version by editing the URL and clearing the hash, then run
+# `agentbox vendor` and commit the new hash.
+042d20ae885ee4f3b102815f3280b962c377b2e9fb44de4037908cc530eae4d4  pi.tar.gz  https://github.com/earendil-works/pi/releases/download/v0.85.1/pi-linux-arm64.tar.gz
+b39cfbc58da4b869a88b8a4bc57bd5deb0d24541e704cf7c257da7b53ec81c8f  ast-grep.zip  https://github.com/ast-grep/ast-grep/releases/download/0.45.3/app-aarch64-unknown-linux-gnu.zip
+d636d1b678e9e7f367ecb22b46bd1cabbed234d6bc3b4d96365d2b507f72f86c  uv.tar.gz  https://github.com/astral-sh/uv/releases/download/0.12.17/uv-aarch64-unknown-linux-gnu.tar.gz
+54328bbc2d9c8e0c9f892c544d66c57a83b84139e34909e5ee81758f1ac8fda7  bun.zip  https://github.com/oven-sh/bun/releases/download/bun-v1.4.2/bun-linux-aarch64.zip
+c8ea4b6560841e73157c134fd4a3293914c6ede42e786ee985cf491fde691ba7  rtk.tar.gz  https://github.com/rtk-ai/rtk/releases/download/v0.49.0/rtk-aarch64-unknown-linux-gnu.tar.gz
+e684031df0aa3ac68a55829f13702de53934b1b06d52f1ae8da9954c4c6f1369  ponytail.tgz  https://registry.npmjs.org/@dietrichgebert/ponytail/-/ponytail-4.10.0.tgz
