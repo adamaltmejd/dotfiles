@@ -128,6 +128,40 @@ Override the reference with `AGENTBOX_OP_REF`, or just export
 `OPENCODE_API_KEY` yourself. `pi/models.json` refers to it as
 `"apiKey": "$OPENCODE_API_KEY"`.
 
+## Project environment variables
+
+Nothing from your shell crosses into the sandbox unless it is named. direnv
+does not run in there, and `use op` could not work if it did -- it needs the
+1Password CLI and an authenticated session, which is exactly the credential
+this box keeps out.
+
+Name the variables you want in a per-project `.agentbox-env` (names only,
+never values):
+
+```
+# .agentbox-env
+APP_FEATURE_FLAG
+TEST_SELECTOR
+```
+
+Values are read from your shell at launch, so direnv has already resolved
+them, and they are passed to the container by name -- never written to disk
+and never in its argv. `AGENTBOX_FORWARD_ENV="A B C"` does the same thing for
+a one-off run. A named variable that is unset is reported and skipped.
+
+This is default-empty on purpose. Most project secrets authenticate to
+services the sandbox has no route to, so forwarding them wholesale would be
+risk without benefit -- and it would undo the point of `use op --lazy`, which
+exists so values never enter the shell env in the first place.
+
+When you really do want a whole dotenv loaded, say so explicitly:
+
+```sh
+agentbox run --env-file .env
+```
+
+That forwards everything in the file. Read it first.
+
 ## Changing what the agent can reach
 
 Edit `proxy/allowlist.txt` (one domain per line, a leading dot covers

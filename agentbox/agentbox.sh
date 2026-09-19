@@ -26,6 +26,8 @@ BUILD_GATEWAY="${AGENTBOX_BUILD_GATEWAY:-192.168.64.1}"
 
 # Extra container-level flags, set by `shell`; must precede the image name.
 RUN_FLAGS=()
+FORWARD_ENV=()
+FORWARD_NAMES=()
 
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 STATE="${XDG_STATE_HOME:-$HOME/.local/state}/agentbox"
@@ -102,6 +104,36 @@ proxy_stop() {
     info "proxy stopped"
 }
 
+# Names (never values) of environment variables to carry into the sandbox.
+# Read from the project's .agentbox-env and from AGENTBOX_FORWARD_ENV; the
+# values are taken from the current shell, so direnv has already run. Nothing
+# is forwarded unless it is named here: most project secrets authenticate to
+# services the sandbox has no route to anyway, so forwarding them by default
+# would be risk without benefit.
+collect_forward_env() {
+    local project="$1" name file="$1/.agentbox-env"
+    FORWARD_ENV=()
+    FORWARD_NAMES=()
+    local names=""
+    [ -f "$file" ] && names="$(sed -e 's/#.*//' "$file")"
+    names="$names ${AGENTBOX_FORWARD_ENV:-}"
+    for name in $names; do
+        case "$name" in
+            [A-Za-z_]*) ;;
+            *) die "not a valid environment variable name: $name" ;;
+        esac
+        case "$name" in
+            *[!A-Za-z0-9_]*) die "not a valid environment variable name: $name" ;;
+        esac
+        if [ -n "${!name+set}" ]; then
+            FORWARD_ENV+=(--env "$name")
+            FORWARD_NAMES+=("$name")
+        else
+            info "note: $name is named for forwarding but unset in this shell"
+        fi
+    done
+}
+
 cmd_vendor() {
     local lock="$DIR/vendor.lock" dest="$DIR/vendor"
     mkdir -p "$dest"
@@ -144,6 +176,15 @@ cmd_build() {
 }
 
 cmd_run() {
+    # agentbox's own flags are consumed here; everything after them goes to pi.
+    local env_file=""
+    while [ $# -gt 0 ]; do
+        case "$1" in
+            --env-file) env_file="${2-}"; [ -n "$env_file" ] || die "--env-file needs a path"; shift 2 ;;
+            *) break ;;
+        esac
+    done
+
     local project="${AGENTBOX_PROJECT:-$PWD}"
     [ -d "$project" ] || die "project directory does not exist: $project"
     project="$(cd "$project" && pwd)"
@@ -186,6 +227,16 @@ cmd_run() {
         esac
     fi
 
+    collect_forward_env "$project"
+    local env_file_flag=()
+    if [ -n "$env_file" ]; then
+        [ -f "$env_file" ] || die "--env-file: not a readable file: $env_file"
+        # Unlike the name allowlist this forwards everything in the file.
+        env_file_flag=(--env-file "$env_file")
+        info "forwarding every variable in $env_file"
+    fi
+    [ ${#FORWARD_NAMES[@]} -eq 0 ] || info "forwarding: ${FORWARD_NAMES[*]}"
+
     info "workspace: $project"
     # --no-dns is deliberate: with an allowlisting proxy the container resolves
     # nothing itself, so a missing resolver is one less thing to reach.
@@ -211,6 +262,7 @@ cmd_run() {
         --env NO_PROXY="localhost,127.0.0.1" \
         --env TERM --env COLORTERM \
         --env OPENCODE_API_KEY \
+        "${FORWARD_ENV[@]}" "${env_file_flag[@]}" \
         "$IMAGE" \
         "${defaults[@]}" "$@"
 }
@@ -246,7 +298,8 @@ usage: agentbox <command> [args]
 
   build [--no-cache]   Verify vendor/ against vendor.lock, then build the image
   vendor               Fetch and checksum the pinned build artifacts
-  run [pi args...]     Run pi in $PWD (override with AGENTBOX_PROJECT)
+  run [--env-file F] [pi args...]
+                       Run pi in $PWD (override with AGENTBOX_PROJECT)
   shell                Drop into bash in the sandbox instead of pi
   proxy start|stop|status|log
                        Manage the host-side egress proxy
