@@ -28,6 +28,7 @@ BUILD_GATEWAY="${AGENTBOX_BUILD_GATEWAY:-192.168.64.1}"
 RUN_FLAGS=()
 FORWARD_ENV=()
 FORWARD_NAMES=()
+PROJECT_ENV="${AGENTBOX_TRUST_PROJECT_ENV:-0}"
 
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 STATE="${XDG_STATE_HOME:-$HOME/.local/state}/agentbox"
@@ -45,7 +46,22 @@ ensure_network() {
     if ! container network inspect "$NETWORK" >/dev/null 2>&1; then
         info "creating host-only network $NETWORK ($SUBNET)"
         container network create --internal --subnet "$SUBNET" "$NETWORK" >/dev/null
+        return
     fi
+    # Existence is not the property we need. A network of this name that was
+    # created without --internal would route straight past squid, so prove it
+    # is host-only and on the expected subnet before trusting it.
+    local info_json mode subnet
+    info_json="$(container network inspect "$NETWORK")"
+    mode="$(printf '%s' "$info_json" | sed -n 's/.*"mode" *: *"\([^"]*\)".*/\1/p' | head -1)"
+    subnet="$(printf '%s' "$info_json" | sed -n 's/.*"ipv4Subnet" *: *"\([^"]*\)".*/\1/p' | head -1)"
+    [ "$mode" = "hostOnly" ] || die "network $NETWORK is mode '$mode', not hostOnly.
+  A non-internal network of this name would give the container a route around
+  the egress allowlist. Remove it and let agentbox recreate it:
+    container network delete $NETWORK"
+    [ "$subnet" = "$SUBNET" ] || die "network $NETWORK is on $subnet, expected $SUBNET.
+  The proxy only accepts clients from $SUBNET, so this would fail closed --
+  but fix it deliberately: container network delete $NETWORK"
 }
 
 gateway() {
@@ -114,9 +130,20 @@ collect_forward_env() {
     local project="$1" name file="$1/.agentbox-env"
     FORWARD_ENV=()
     FORWARD_NAMES=()
-    local names=""
-    [ -f "$file" ] && names="$(sed -e 's/#.*//' "$file")"
-    names="$names ${AGENTBOX_FORWARD_ENV:-}"
+    # AGENTBOX_FORWARD_ENV comes from the invoking shell and is always honoured.
+    local names="${AGENTBOX_FORWARD_ENV:-}"
+    # .agentbox-env lives in the project checkout, so a repository you do not
+    # control could name AWS_SECRET_ACCESS_KEY or GITHUB_TOKEN and have it
+    # forwarded from your shell before the agent starts. It is read only on an
+    # explicit opt-in from the host side.
+    if [ -f "$file" ]; then
+        if [ "$PROJECT_ENV" = "1" ]; then
+            names="$names $(sed -e 's/#.*//' "$file")"
+        else
+            info "note: $project/.agentbox-env exists but is repo-controlled and was NOT read."
+            info "      Pass --project-env (or set AGENTBOX_TRUST_PROJECT_ENV=1) to use it."
+        fi
+    fi
     for name in $names; do
         case "$name" in
             [A-Za-z_]*) ;;
@@ -168,8 +195,12 @@ cmd_build() {
     cmd_vendor
     proxy_start
     info "building $IMAGE"
+    # The image user must match the host user, or the mounted project comes
+    # back owned by someone else. Do not assume 501.
     container build \
         --dns "$BUILD_DNS" \
+        --build-arg "BOX_UID=$(id -u)" \
+        --build-arg "BOX_GID=$(id -g)" \
         --build-arg "http_proxy=http://$BUILD_GATEWAY:$PROXY_PORT" \
         --build-arg "https_proxy=http://$BUILD_GATEWAY:$PROXY_PORT" \
         --tag "$IMAGE" --file "$DIR/Containerfile" "$@" "$DIR"
@@ -181,6 +212,7 @@ cmd_run() {
     while [ $# -gt 0 ]; do
         case "$1" in
             --env-file) env_file="${2-}"; [ -n "$env_file" ] || die "--env-file needs a path"; shift 2 ;;
+            --project-env) PROJECT_ENV=1; shift ;;
             *) break ;;
         esac
     done
@@ -298,7 +330,7 @@ usage: agentbox <command> [args]
 
   build [--no-cache]   Verify vendor/ against vendor.lock, then build the image
   vendor               Fetch and checksum the pinned build artifacts
-  run [--env-file F] [pi args...]
+  run [--env-file F] [--project-env] [pi args...]
                        Run pi in $PWD (override with AGENTBOX_PROJECT)
   shell                Drop into bash in the sandbox instead of pi
   proxy start|stop|status|log

@@ -12,11 +12,16 @@ acl boxnet src @SUBNET@ @BUILD_SUBNET@ 127.0.0.1/32
 
 acl allowed dstdomain "@FILTER@"
 acl SSL_ports port 443
+acl Safe_ports port 80 443
 acl CONNECT method CONNECT
 
 http_access deny !boxnet
-# No tunnelling arbitrary protocols out over port 80, 22 or anything else.
+# Port restrictions must cover both request shapes. CONNECT is limited to 443,
+# but a plain proxied GET names its own port and is NOT a CONNECT -- without
+# Safe_ports squid will happily fetch http://allowed-host:22/ on the agent's
+# behalf. Deny everything outside 80/443 before the allow rule.
 http_access deny CONNECT !SSL_ports
+http_access deny !Safe_ports
 http_access allow boxnet allowed
 http_access deny all
 

@@ -61,7 +61,8 @@ source code in a prompt. Mount only what the task needs.
 `agentbox build` is a one-off (and after you change the `Containerfile`).
 `agentbox run` starts a fresh micro-VM each time — it does not rebuild.
 
-Exactly two host directories are mounted, nothing else:
+Three host directories are mounted, nothing else. Each one is a hole in
+the boundary, so the list is worth knowing exactly:
 
 | Mount | Purpose |
 |---|---|
@@ -135,8 +136,13 @@ does not run in there, and `use op` could not work if it did -- it needs the
 1Password CLI and an authenticated session, which is exactly the credential
 this box keeps out.
 
-Name the variables you want in a per-project `.agentbox-env` (names only,
-never values):
+Name the variables you want. From the host side, which is always honoured:
+
+```sh
+AGENTBOX_FORWARD_ENV="APP_FEATURE_FLAG TEST_SELECTOR" agentbox run
+```
+
+Or in a per-project `.agentbox-env` (names only, never values):
 
 ```
 # .agentbox-env
@@ -144,10 +150,19 @@ APP_FEATURE_FLAG
 TEST_SELECTOR
 ```
 
+**`.agentbox-env` is opt-in, because it lives in the project checkout.** A
+repository you did not write could list `AWS_SECRET_ACCESS_KEY` or
+`GITHUB_TOKEN` and have them forwarded out of your shell before the agent
+starts. agentbox reports the file but does not read it unless you say so:
+
+```sh
+agentbox run --project-env          # or AGENTBOX_TRUST_PROJECT_ENV=1
+```
+
 Values are read from your shell at launch, so direnv has already resolved
 them, and they are passed to the container by name -- never written to disk
-and never in its argv. `AGENTBOX_FORWARD_ENV="A B C"` does the same thing for
-a one-off run. A named variable that is unset is reported and skipped.
+and never in its argv. A named variable that is unset is reported and skipped,
+and the names actually forwarded are printed at startup.
 
 This is default-empty on purpose. Most project secrets authenticate to
 services the sandbox has no route to, so forwarding them wholesale would be

@@ -8,8 +8,9 @@
 
 FROM debian:trixie-slim
 
-# Host UID/GID so files written to /workspace are owned by the macOS user
-# (501:20) rather than the usual container 1000 -- the article's known wart.
+# Files written to /workspace must come back owned by the host user rather
+# than the usual container 1000. agentbox.sh passes the real `id -u`/`id -g`;
+# the defaults here only matter for a bare `container build`.
 ARG BOX_UID=501
 ARG BOX_GID=20
 
@@ -57,7 +58,10 @@ RUN set -eux; \
     chmod +x /usr/local/bin/ast-grep /usr/local/bin/uv /usr/local/bin/uvx /usr/local/bin/bun; \
     rm -rf /tmp/vendor
 
-RUN useradd --uid "${BOX_UID}" --gid "${BOX_GID}" --create-home --shell /bin/bash box
+# The gid may not exist in Debian (macOS staff=20 collides with dialout, other
+# hosts may have no group at all), so create one when it is missing.
+RUN getent group "${BOX_GID}" >/dev/null || groupadd --gid "${BOX_GID}" box \
+ && useradd --uid "${BOX_UID}" --gid "${BOX_GID}" --create-home --shell /bin/bash box
 
 USER box
 WORKDIR /workspace
