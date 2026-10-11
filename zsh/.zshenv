@@ -26,13 +26,20 @@ fi
 export BUN_INSTALL="$XDG_DATA_HOME/bun"
 export BUN_INSTALL_CACHE_DIR="$XDG_CACHE_HOME/bun"
 
+# Rust: rustup (Homebrew, keg-only) manages toolchains; keep its state in XDG
+# dirs instead of ~/.rustup and ~/.cargo.
+export RUSTUP_HOME="$XDG_DATA_HOME/rustup"
+export CARGO_HOME="$XDG_DATA_HOME/cargo"
+
 # Additional paths
 typeset -U path PATH
 path=(
   "$HOME/.local/bin"
   "$BUN_INSTALL/bin"
+  "$CARGO_HOME/bin"
   $path
 )
+[[ -n "$HOMEBREW_PREFIX" ]] && path+=("$HOMEBREW_PREFIX/opt/rustup/bin")
 [[ "$OSTYPE" == darwin* ]] && path+=("/Applications/Obsidian.app/Contents/MacOS")
 
 #

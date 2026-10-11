@@ -32,6 +32,10 @@ brew "gh"
 brew "python3"
 brew "uv"
 brew "oven-sh/bun/bun"
+# Keg-only; zsh/.zshenv adds its bin to PATH. Toolchains live in RUSTUP_HOME.
+brew "rustup"
+# Cross-compiles with zig as linker (pulls in zig); pinfold builds on macOS.
+brew "cargo-zigbuild"
 
 # Documents
 brew "pandoc"
