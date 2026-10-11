@@ -20,6 +20,8 @@ brew "tmux"
 brew "terminal-notifier"
 brew "pinentry-mac"
 brew "mole"
+# g-prefixed GNU tools; setup.sh links only gtimeout -> ~/.local/bin/timeout
+brew "coreutils"
 
 # Version control
 brew "git-lfs"

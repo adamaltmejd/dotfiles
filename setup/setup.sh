@@ -277,6 +277,13 @@ fi
 
 phase "Post-setup"
 
+# Expose GNU timeout unprefixed (agents and scripts expect it). Only this one
+# tool: putting coreutils' gnubin on PATH would shadow BSD ls/date/stat.
+if [[ "$OS_ID" == "darwin" ]] && _gtimeout="$(command -v gtimeout)"; then
+    run_or_print ln -sf "$_gtimeout" "$HOME/.local/bin/timeout"
+fi
+unset _gtimeout
+
 if [[ "$DOTFILES_FEAT_REMOTE_SSH" -eq 1 ]]; then
     if [[ "$OS_ID" != "darwin" || "$PROFILE" != "local" ]]; then
         die "remote-ssh is supported only by the macOS local profile"
