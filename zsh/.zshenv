@@ -79,3 +79,6 @@ export ANSIBLE_VAULT_PASSWORD_FILE="$XDG_CONFIG_HOME/ansible/vault-password-file
 
 # UV Cache needs to go in /tmp instead of ~/.cache for codex sandboxing to not error
 export UV_CACHE_DIR=/tmp/uv-cache
+
+# Use Pinfold's built-in full tool profile.
+export PINFOLD_PROFILE=full

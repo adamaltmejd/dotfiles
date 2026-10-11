@@ -45,10 +45,9 @@ brew "openssl"
 brew "mbedtls"
 brew "zstd"
 
-# Sandboxed coding agent (github.com/adamaltmejd/agentbox): Apple's container
-# runtime plus the host-side egress proxy that enforces its allowlist.
+# Apple's container runtime, used by pinfold (github.com/adamaltmejd/pinfold)
+# to run coding agents in disposable micro-VMs.
 brew "container"
-brew "squid"
 
 # Casks
 cask "1password-cli"
