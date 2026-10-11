@@ -1,7 +1,6 @@
 {
   "env": {
-    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1",
-    "CLAUDE_AUTOCOMPACT_PCT_OVERRIDE": "60"
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
   },
   "permissions": {
     "defaultMode": "auto"
@@ -19,9 +18,9 @@
     "frontend-design@claude-plugins-official": true,
     "commit-commands@claude-plugins-official": true,
     "claude-md-management@claude-plugins-official": true,
-    "discord@claude-plugins-official": true,
     "microdata-tools-se@microdata-tools-se": true,
-    "claude-code-setup@claude-plugins-official": true
+    "claude-code-setup@claude-plugins-official": true,
+    "cc-plugin-you-should-know@builtin": true
   },
   "extraKnownMarketplaces": {
     "microdata-tools-se": {
@@ -32,12 +31,13 @@
       "autoUpdate": true
     }
   },
-  "effortLevel": "xhigh",
+  "effortLevel": "medium",
   "tui": "fullscreen",
   "skipDangerousModePermissionPrompt": true,
   "skipWorkflowUsageWarning": true,
   "preferredNotifChannel": "auto",
   "autoCompactEnabled": true,
+  "autoCompactWindow": 400000,
   "teammateMode": "auto",
   "remoteControlAtStartup": true,
   "crossSessionInbound": "accept",
@@ -45,5 +45,10 @@
   "agentPushNotifEnabled": true,
   "skipAutoPermissionPrompt": true,
   "voiceEnabled": true,
-  "model": "claude-fable-5-1[1m]"
+  "advisorModel": "fable",
+  "switchModelsOnFlag": false,
+  "outputStyle": "Concise",
+  "sandbox": {
+    "enabled": false
+  }
 }

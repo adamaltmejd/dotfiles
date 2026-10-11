@@ -22,28 +22,28 @@
 - Prefer self-explanatory code. Comment only non-obvious intent, convention
   deviations, footguns, relevant issue links, and revisit triggers.
 
-## Testing
-
-- Behavior changes require focused tests using the existing test setup. Bug fixes
-  require a regression test. Explain exceptions and perform the strongest practical
-  verification.
-- Size tests like neighboring test files, roughly one per stated behavior. Don't
-  promote scratch checks to permanent test files.
-- Test observable behavior, important edge cases, and critical invariants, not
-  incidental implementation details. Never weaken tests solely to make code pass.
-- Run targeted checks while iterating and relevant project checks before completion.
-  Report what was not run; never claim an unrun check passed.
-
 ## Agents
 
-- Use subagents proactively for parallelizable or specialized work. Delegate clearly
-  separable tasks by default; give each a narrow scope, relevant context, and
+- Use subagents proactively for bounded, separable work: research, audits,
+  implementation, review. Give each a narrow scope, relevant context, and
   appropriate skills. Treat this as standing user authorization.
+- Subagent prompt cache expires after 5 idle minutes. Don't make them wait, and
+  start a fresh one rather than resuming an idle one.
+- Delegate work that waits or watches (slow builds, tests, CI, long runs) to a
+  separate session via `start_session` (1-hour cache); if unavailable, do it in
+  the main session.
+- In a worktree-isolated agent, the harness refuses compound commands it can't
+  verify. Run one plain command per call: absolute paths and `git -C <path>`
+  instead of `cd … &&`, no pipes or `$(…)`. Write multi-line scripts to the
+  scratchpad and run the file instead of a heredoc.
+- Never use foreground `sleep` (the harness blocks it). Use Monitor with an
+  until-loop, or `run_in_background`.
 
 ## Tool defaults
 
 - Follow repository tooling; otherwise prefer:
-  - Python: `uv`, `ruff check`, `ruff format`
+  - Python: `uv`, `ruff check`, `ruff format`. Run scripts with `uv run`; bare
+    `python3` has none of the project's dependencies.
   - R: `air`, `jarl`
   - Shell: `shellcheck` (sh/bash), `shfmt`
   - JavaScript/TypeScript: `bun`

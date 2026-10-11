@@ -22,28 +22,19 @@
 - Prefer self-explanatory code. Comment only non-obvious intent, convention
   deviations, footguns, relevant issue links, and revisit triggers.
 
-## Testing
-
-- Behavior changes require focused tests using the existing test setup. Bug fixes
-  require a regression test. Explain exceptions and perform the strongest practical
-  verification.
-- Size tests like neighboring test files, roughly one per stated behavior. Don't
-  promote scratch checks to permanent test files.
-- Test observable behavior, important edge cases, and critical invariants, not
-  incidental implementation details. Never weaken tests solely to make code pass.
-- Run targeted checks while iterating and relevant project checks before completion.
-  Report what was not run; never claim an unrun check passed.
-
 ## Agents
 
-- Use subagents proactively for parallelizable or specialized work. Delegate clearly
-  separable tasks by default; give each a narrow scope, relevant context, and
+- Use subagents proactively for bounded, separable work: research, audits,
+  implementation, review. Give each a narrow scope, relevant context, and
   appropriate skills. Treat this as standing user authorization.
+- Don't make subagents wait on slow builds, tests, CI, or long runs; do that
+  work in the main session.
 
 ## Tool defaults
 
 - Follow repository tooling; otherwise prefer:
-  - Python: `uv`, `ruff check`, `ruff format`
+  - Python: `uv`, `ruff check`, `ruff format`. Run scripts with `uv run`; bare
+    `python3` has none of the project's dependencies.
   - R: `air`, `jarl`
   - Shell: `shellcheck` (sh/bash), `shfmt`
   - JavaScript/TypeScript: `bun`
