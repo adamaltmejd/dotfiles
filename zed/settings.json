@@ -7,6 +7,16 @@
 // custom settings, run `zed: open default settings` from the
 // command palette (cmd-shift-p / ctrl-shift-p)
 {
+  "languages": {
+    "LaTeX": {
+      "preferred_line_length": 100,
+      "soft_wrap": "prefer_line"
+    }
+  },
+  "git": {
+    "diff_base": "default_branch"
+  },
+  "cli_default_open_behavior": "existing_window",
   "session": {
     "trust_all_worktrees": true
   },
