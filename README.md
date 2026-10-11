@@ -150,6 +150,7 @@ dotfiles/
 ├── ssh/                    # ssh config + config.d/ for hosts
 ├── r/                      # Rprofile, Renviron, Makevars, lintr
 ├── radian/                 # radian console config
+├── cargo/                  # config.toml (sccache), linked into CARGO_HOME
 ├── tmux/                   # auto-attached macOS SSH session + host status
 ├── zellij/                 # zellij multiplexer config (server use)
 ├── agents/                 # AI agent configs + shared skills

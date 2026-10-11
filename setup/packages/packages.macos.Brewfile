@@ -34,6 +34,8 @@ brew "uv"
 brew "oven-sh/bun/bun"
 # Keg-only; zsh/.zshenv adds its bin to PATH. Toolchains live in RUSTUP_HOME.
 brew "rustup"
+# Compiler cache; cargo/config.toml sets it as rustc-wrapper.
+brew "sccache"
 # Cross-compiles with zig as linker (pulls in zig); pinfold builds on macOS.
 brew "cargo-zigbuild"
 

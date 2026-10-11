@@ -241,6 +241,14 @@ else
     log_info "Skipping agent configs (use --with-claude to include)."
 fi
 
+# Cargo config sets sccache as rustc-wrapper; only the macOS Brewfile installs it.
+if [[ "$OS_ID" == "darwin" && "$PROFILE" == "local" ]]; then
+    _cargo_home="${XDG_DATA_HOME:-$HOME/.local/share}/cargo"
+    ensure_dir "$_cargo_home"
+    link_file "$DOTFILES_DIR/cargo/config.toml" "$_cargo_home/config.toml" "$BACKUP_DIR"
+    unset _cargo_home
+fi
+
 # macOS SSH FIDO2 support (build sk-libfido2.dylib if missing)
 if [[ "$OS_ID" == "darwin" && -x "$DOTFILES_DIR/ssh/build-sk-libfido2.sh" ]]; then
     if [[ ! -f /usr/local/lib/sk-libfido2.dylib ]]; then

@@ -1,0 +1,5 @@
+# Linked to $CARGO_HOME/config.toml by setup.sh (macOS local profile).
+# sccache shares compiled crates across worktrees, e.g. the
+# registry-research-toolkit agent worktrees. Remove to go back to plain rustc.
+[build]
+rustc-wrapper = "sccache"

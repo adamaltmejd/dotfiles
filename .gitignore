@@ -33,6 +33,10 @@ ssh/id_*
 !r/Makevars
 !r/lintr
 
+# Cargo (explicit file only; CARGO_HOME itself lives in XDG_DATA_HOME)
+!cargo/
+!cargo/config.toml
+
 # Radian (R console)
 !radian/
 !radian/**
