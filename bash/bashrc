@@ -1,0 +1,74 @@
+# shellcheck shell=bash
+# Environment must precede the interactive guard: sshd can source .bashrc for
+# noninteractive commands. Plain bash -c inherits its caller's environment.
+source "${DOTFILES_DIR:-${XDG_CONFIG_HOME:-$HOME/.config}}/bash/env.bash"
+[[ $- == *i* ]] || return 0
+
+# PROMPT_COMMAND arrays require Bash 5.1+, not Apple's 3.2.
+if (( BASH_VERSINFO[0] < 5 || (BASH_VERSINFO[0] == 5 && BASH_VERSINFO[1] < 1) )); then
+    printf 'Dotfiles require Bash 5.1+: use Homebrew Bash on macOS.\n' >&2
+    return 1
+fi
+[[ ${_DOTFILES_BASHRC_PID:-} != "$$" ]] || return 0
+_DOTFILES_BASHRC_PID=$$
+
+# shellcheck source=/dev/null
+[[ -r "$DOTFILES_DIR/setup/profile" ]] && source "$DOTFILES_DIR/setup/profile"
+feat() {
+    local key="DOTFILES_FEAT_${1^^}"
+    [[ ${!key:-0} == 1 ]]
+}
+
+# Completion before fzf, which owns Ctrl-R/Ctrl-T when enabled.
+if feat smartcli; then
+    for _completion in "${HOMEBREW_PREFIX:-/nonexistent}/etc/profile.d/bash_completion.sh" /usr/share/bash-completion/bash_completion; do
+        if [[ -r "$_completion" ]]; then
+            # shellcheck source=/dev/null
+            source "$_completion"
+            break
+        fi
+    done
+    unset _completion
+fi
+
+for _conf in "$DOTFILES_DIR"/bash/conf.d/*.bash; do
+    # shellcheck source=/dev/null
+    [[ -r "$_conf" ]] && source "$_conf"
+done
+unset _conf
+
+if feat direnv && command -v direnv >/dev/null 2>&1; then
+    eval "$(direnv hook bash)"
+fi
+if feat smartcli && command -v zoxide >/dev/null 2>&1; then
+    eval "$(zoxide init bash)"
+fi
+if feat smartcli && command -v fzf >/dev/null 2>&1; then
+    # shellcheck source=/dev/null
+    source <(fzf --bash)
+fi
+
+PROMPT_COMMAND+=(_dotfiles_history_sync _dotfiles_reset_mouse)
+
+# Starship wraps the prior prompt command and captures $? and PIPESTATUS before
+# calling it. Initialize it last; direnv prepended afterward would mask failures
+# in pipelines. Its Bash integration expects the saved hooks as a scalar.
+if feat starship && command -v starship >/dev/null 2>&1; then
+    printf -v _dotfiles_prompt_hooks '%s\n' "${PROMPT_COMMAND[@]}"
+    unset PROMPT_COMMAND
+    # shellcheck disable=SC2178 # Starship requires a scalar saved hook list.
+    PROMPT_COMMAND=$_dotfiles_prompt_hooks
+    unset _dotfiles_prompt_hooks
+    eval "$(starship init bash)"
+fi
+
+# shellcheck source=/dev/null
+[[ -r "$XDG_CONFIG_HOME/bash/local.bash" ]] && source "$XDG_CONFIG_HOME/bash/local.bash"
+
+# Only interactive SSH sessions attach. Remote commands and file transfers must
+# remain silent and must never be replaced by tmux.
+if [[ "$OSTYPE" == darwin* && -n ${SSH_CONNECTION:-} && -n ${SSH_TTY:-} &&
+    -z ${TMUX:-} && ${TERM:-dumb} != dumb && ${DOTFILES_NO_AUTO_TMUX:-0} != 1 ]] &&
+    command -v tmux >/dev/null 2>&1; then
+    exec tmux new-session -A -s main
+fi

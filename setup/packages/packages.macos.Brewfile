@@ -11,7 +11,7 @@ brew "libomp"
 brew "libfido2"
 
 # Shell and CLI
-brew "antidote"
+brew "bash-completion@2"
 brew "shellcheck"
 brew "shfmt"
 brew "tlrc"
@@ -32,7 +32,7 @@ brew "gh"
 brew "python3"
 brew "uv"
 brew "oven-sh/bun/bun"
-# Keg-only; zsh/.zshenv adds its bin to PATH. Toolchains live in RUSTUP_HOME.
+# Keg-only; bash/env.bash adds its bin to PATH. Toolchains live in RUSTUP_HOME.
 brew "rustup"
 # Compiler cache; cargo/config.toml sets it as rustc-wrapper.
 brew "sccache"

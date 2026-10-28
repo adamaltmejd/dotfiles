@@ -3,7 +3,7 @@
 // Use Ghostty for local splits; zellij is for session persistence on servers
 default_layout "compact"
 pane_frames false
-default_shell "zsh"
+default_shell "bash"
 
 // Don't grab mouse — let terminal handle it
 mouse_mode false

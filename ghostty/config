@@ -1,6 +1,6 @@
 auto-update-channel = stable
 
-shell-integration = zsh
+shell-integration = detect
 # Keep locale forwarding disabled for C-only homelab hosts, but let Ghostty
 # install its terminal definition automatically before interactive SSH.
 shell-integration-features = no-ssh-env,ssh-terminfo
