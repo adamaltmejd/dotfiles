@@ -283,6 +283,32 @@ EOF
         command cat "$WORK_DIR/integrations.err" >&2
         fail 'installed prompt integrations lost command or pipeline status'
     fi
+
+    # Ghostty injects its hooks after sourcing our startup files. Test the
+    # installed script in that order, rather than just testing Starship alone.
+    ghostty_script=/Applications/Ghostty.app/Contents/Resources/ghostty/shell-integration/bash/ghostty.bash
+    if [[ -r "$ghostty_script" ]]; then
+        if ! clean_bash --noprofile --norc -i -c '
+            GHOSTTY_BASH_INJECT=1
+            source "$1"
+            [[ $(declare -p PROMPT_COMMAND) == "declare -a"* ]] || exit 1
+            [[ ${PROMPT_COMMAND[0]} == starship_precmd ]] || exit 2
+            [[ ${PROMPT_COMMAND[1]} == *__ghostty_hook* ]] || exit 3
+            false | true
+            eval "${PROMPT_COMMAND[0]}"
+            [[ ${STARSHIP_PIPE_STATUS[*]} == "1 0" && $STARSHIP_CMD_STATUS == 0 ]] || exit 4
+            false
+            eval "${PROMPT_COMMAND[0]}"
+            [[ $STARSHIP_CMD_STATUS == 1 ]] || exit 5
+            eval "${PROMPT_COMMAND[1]}"
+            [[ ! -e $TEST_OP_ARGS ]] || exit 6
+        ' test "$ghostty_script" >"$WORK_DIR/ghostty.out" 2>"$WORK_DIR/ghostty.err"; then
+            command cat "$WORK_DIR/ghostty.err" >&2
+            fail 'Ghostty injection lost prompt hook order or pipeline status'
+        fi
+    else
+        printf 'SKIP: Ghostty injection test needs the installed macOS application\n'
+    fi
 else
     printf 'SKIP: combined integration test needs starship, direnv, zoxide, and fzf\n'
 fi

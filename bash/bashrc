@@ -60,6 +60,9 @@ if feat starship && command -v starship >/dev/null 2>&1; then
     PROMPT_COMMAND=$_dotfiles_prompt_hooks
     unset _dotfiles_prompt_hooks
     eval "$(starship init bash)"
+    # Ghostty injects after startup. An array makes it append its hook; for a
+    # scalar it prepends status-restoration commands that overwrite PIPESTATUS.
+    PROMPT_COMMAND=("${PROMPT_COMMAND[0]}")
 fi
 
 # shellcheck source=/dev/null
