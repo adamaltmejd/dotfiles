@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# A fresh Mac starts this script with Apple's Bash 3.2. Dry runs remain
+# available there; feature-name conversion below must stay compatible.
+
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 DOTFILES_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 
@@ -23,7 +26,7 @@ Options:
   --dry-run             Print planned changes without applying
   -y, --yes             Skip confirmation prompt
   --xdg-config-home <path>
-                        Set default XDG_CONFIG_HOME written to ~/.zshenv (default: ~/.config)
+                        Set default XDG_CONFIG_HOME written to ~/.bashrc (default: ~/.config)
   --with-<feature>      Enable a feature (starship, direnv, smartcli, r, claude,
                         remote-ssh)
   --without-<feature>   Disable a feature
@@ -72,14 +75,14 @@ while [[ $# -gt 0 ]]; do
         --with-*)
             _feat="${1#--with-}"
             _feat="${_feat//-/_}"
-            FEATURE_OVERRIDES+=("${_feat^^}=1")
+            FEATURE_OVERRIDES+=("$(printf '%s' "$_feat" | tr '[:lower:]' '[:upper:]')=1")
             unset _feat
             shift
             ;;
         --without-*)
             _feat="${1#--without-}"
             _feat="${_feat//-/_}"
-            FEATURE_OVERRIDES+=("${_feat^^}=0")
+            FEATURE_OVERRIDES+=("$(printf '%s' "$_feat" | tr '[:lower:]' '[:upper:]')=0")
             unset _feat
             shift
             ;;
@@ -162,7 +165,7 @@ fi
 phase "Ensure base directories"
 ensure_dir "$HOME/.local/bin"
 ensure_dir "$HOME/.local/share"
-ensure_dir "$HOME/.local/state/zsh"
+ensure_dir "$HOME/.local/state/bash"
 ensure_dir "$HOME/.cache"
 ensure_dir "$HOME/.ssh"
 set_mode "$HOME/.ssh" 700
@@ -170,7 +173,8 @@ ensure_dir "$HOME/.ssh/sockets"
 set_mode "$HOME/.ssh/sockets" 700
 
 phase "Link / write managed files"
-write_file_from_string "$HOME/.zshenv" "$(bootstrap_zshenv_content "$DOTFILES_DIR" "$XDG_CONFIG_HOME_VALUE" "$PROFILE")" "$BACKUP_DIR"
+write_file_from_string "$HOME/.bashrc" "$(bootstrap_bashrc_content "$DOTFILES_DIR" "$XDG_CONFIG_HOME_VALUE" "$PROFILE")" "$BACKUP_DIR"
+write_file_from_string "$HOME/.bash_profile" "$(bootstrap_bash_profile_content)" "$BACKUP_DIR"
 if [[ "$PROFILE" == "local" ]]; then
     _ssh_includes="Include $DOTFILES_DIR/ssh/config.macos
 Include $DOTFILES_DIR/ssh/config.shared"
@@ -365,14 +369,15 @@ if [[ "$OS_ID" == "darwin" && "$APPLY" -eq 1 ]]; then
         printf '\nApply macOS defaults (keyboard, Finder, Dock, etc.)? [y/N] '
         read -r answer
         if [[ "$answer" =~ ^[Yy] ]]; then
-            "$DOTFILES_DIR/setup/macos-defaults.zsh"
+            "$DOTFILES_DIR/setup/macos-defaults.sh"
         fi
     else
-        log_info "Skipping macOS defaults (non-interactive). Run manually: $DOTFILES_DIR/setup/macos-defaults.zsh"
+        log_info "Skipping macOS defaults (non-interactive). Run manually: $DOTFILES_DIR/setup/macos-defaults.sh"
     fi
 fi
 
-log_info "Verify: zsh -i -c 'exit'"
+log_info "Verify: bash -i -c 'exit' (use Homebrew Bash on macOS)"
+log_info "Login shell unchanged. See README.md for the staged Bash cutover."
 log_info "Verify: git config --list | head"
 if [[ "$DOTFILES_FEAT_R" -eq 1 ]]; then
     log_info "Verify: R --quiet -e 'sessionInfo()'"

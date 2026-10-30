@@ -1,4 +1,4 @@
-#!/usr/bin/env zsh
+#!/usr/bin/env bash
 # Build sk-libfido2.dylib for macOS built-in SSH FIDO2 support
 # Required because Apple's OpenSSH doesn't include security key support
 set -e
@@ -13,7 +13,7 @@ echo "Building sk-libfido2.dylib for SSH security key support..."
 # Track which build tools need to be installed (and later removed)
 BUILD_DEPS=(autoconf automake libtool)
 INSTALLED_DEPS=()
-for dep in $BUILD_DEPS; do
+for dep in "${BUILD_DEPS[@]}"; do
     if ! brew list "$dep" &>/dev/null; then
         INSTALLED_DEPS+=("$dep")
     fi

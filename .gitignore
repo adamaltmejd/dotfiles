@@ -10,6 +10,15 @@
 !zsh/
 !zsh/**
 
+# Bash configuration and shell-neutral secret templates
+!bash/
+!bash/**
+!secrets/
+!secrets/base.env
+!secrets/*.env.tpl
+secrets/local.sh
+bash/local.bash
+
 # Git+Github configuration
 !git/
 !git/**

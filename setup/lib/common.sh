@@ -59,23 +59,25 @@ set_mode() {
     fi
 }
 
-bootstrap_zshenv_content() {
+# The generated source expands these variables when the shell starts.
+# shellcheck disable=SC2016
+bootstrap_bashrc_content() {
     local dotfiles_dir="$1"
     local xdg_config_home="$2"
     local profile="${3:-}"
-    cat <<EOF_INNER
-#!/usr/bin/env zsh
-# Managed by dotfiles setup.sh
-export XDG_CONFIG_HOME="\${XDG_CONFIG_HOME:-$xdg_config_home}"
-export XDG_DATA_HOME="\${XDG_DATA_HOME:-\$HOME/.local/share}"
-export XDG_STATE_HOME="\${XDG_STATE_HOME:-\$HOME/.local/state}"
-export XDG_CACHE_HOME="\${XDG_CACHE_HOME:-\$HOME/.cache}"
+    printf '# Managed by dotfiles setup.sh\n'
+    printf 'export XDG_CONFIG_HOME=${XDG_CONFIG_HOME:-%q}\n' "$xdg_config_home"
+    printf 'export DOTFILES_DIR=${DOTFILES_DIR:-%q}\n' "$dotfiles_dir"
+    printf 'export DOTFILES_PROFILE=${DOTFILES_PROFILE:-%q}\n' "$profile"
+    printf 'source "$DOTFILES_DIR/bash/bashrc"\n'
+}
 
-export DOTFILES_DIR="\${DOTFILES_DIR:-$dotfiles_dir}"
-export DOTFILES_PROFILE="\${DOTFILES_PROFILE:-${profile}}"
-export ZDOTDIR="\$DOTFILES_DIR/zsh"
-[[ -f "\$ZDOTDIR/.zshenv" ]] && source "\$ZDOTDIR/.zshenv"
-EOF_INNER
+bootstrap_bash_profile_content() {
+    cat <<'EOF'
+# Managed by dotfiles setup.sh
+# Bash does not read .bashrc for login shells unless requested here.
+[[ ! -r "$HOME/.bashrc" ]] || source "$HOME/.bashrc"
+EOF
 }
 
 # Build the profile feature-flag file content.

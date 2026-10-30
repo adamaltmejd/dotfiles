@@ -1,0 +1,10 @@
+Ghostty splits
+  Cmd+D             split right
+  Cmd+Shift+D       split down
+  Cmd+Opt+Arrow     navigate splits
+  Cmd+Ctrl+Arrow    resize splits
+  Cmd+Shift+Enter   zoom/unzoom split
+  Cmd+Ctrl+=        equalize splits
+
+Prompt jump (shell integration)
+  Cmd+Shift+Arrow   jump between prompts in scrollback

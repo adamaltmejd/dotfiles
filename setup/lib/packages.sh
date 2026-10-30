@@ -151,7 +151,7 @@ install_feature_packages() {
         local basename="${feat_file##*/}"
         local feat_name="${basename#packages.feat-}"
         feat_name="${feat_name%.txt}"
-        feat_name="${feat_name^^}"
+        feat_name="$(printf '%s' "$feat_name" | tr '[:lower:]' '[:upper:]')"
         local var="DOTFILES_FEAT_${feat_name}"
 
         if [[ "${!var:-0}" -eq 1 ]]; then
