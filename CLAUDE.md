@@ -26,7 +26,7 @@ Each tool has its own directory (`bash/`, `git/`, `r/`, `ssh/`, etc.) using XDG-
 - `zsh/` is legacy rollback configuration. Do not add new features there or remove it until live cutover checks pass.
 - SSH hosts: `ssh/config.d/` (`*.local` gitignored)
 - New tool: own directory if XDG-native, otherwise add symlink in `setup.sh`
-- Secrets via direnv + 1Password CLI. Templates with `op://` refs in `secrets/`. Custom `use_op` in `direnv/direnvrc` resolves and caches. Per-project `.envrc` loads secrets with `use op <template>`; `use op --lazy …` defers resolution to `oprun <cmd>` (never cached, never in shell env). `direnvrc` header documents both. The old base-template symlink exists only for staged migration of project references.
+- Secrets via direnv + 1Password CLI. Templates with `op://` refs in `secrets/`. Custom `use_op` in `direnv/direnvrc` resolves and caches. Per-project `.envrc` loads secrets with `use op <template>`; `use op --lazy …` defers resolution to `oprun <cmd>` (never cached, never in shell env). `direnvrc` header documents both. Old `zsh/secrets/` references intentionally fail until updated; do not add compatibility links.
 
 ## Package manager supply chain safety
 

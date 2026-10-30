@@ -66,8 +66,8 @@ account; migrate other Macs, Linux hosts and the restricted runner separately.
    The first version omits zsh's autosuggestions, syntax highlighting and
    transient prompt. Starship's normal prompt remains.
 4. Update existing project `.envrc` files from `~/.config/zsh/secrets/` to
-   `~/.config/secrets/`, then review/allow the changed direnv files. The old
-   `zsh/secrets/base.env` is temporarily a compatibility symlink. Custom,
+   `~/.config/secrets/`, then review/allow the changed direnv files. Old paths
+   intentionally fail until updated; there is no compatibility symlink. Custom,
    ignored templates and `local.zsh` overrides need a separate inventory and
    Bash port; never copy or print resolved secret values.
 5. Back up existing home startup files. Remove obsolete Docker Desktop PATH
@@ -96,7 +96,7 @@ Rollback: restore the previous login shell (normally `chsh -s /bin/zsh`) and
 open a fresh terminal. The legacy `zsh/` configuration and existing `~/.zshenv`
 are retained during rollout; setup does not overwrite them. Restore the
 backed-up `.bashrc`/`.bash_profile` if needed. Ghostty detects either shell.
-Only remove the legacy configuration and compatibility symlink after the real
+Only remove the legacy shell configuration after the real
 terminal, agent, project and SSH checks pass on the intended hosts.
 
 ### Profiles
